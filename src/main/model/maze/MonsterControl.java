@@ -5,5 +5,8 @@
 package model.maze;
 
 public class MonsterControl {
-    //EFFECTS: Move Monster
+    //REQUIRES: move should be a valid move
+    //EFFECTS: moves Monster in Grid
+
+    //EFFECTS: Tells Monster where to move
 }
