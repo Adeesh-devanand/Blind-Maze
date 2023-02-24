@@ -7,12 +7,13 @@ package model.maze;
 public class Maze {
     //EFFECTS: Creates blank Maze
     public Maze(String name) {
-        new Grid();
+        new Grid(10, 10);
     }
 
     //MODIFIES: this
     //EFFECTS: Starts time from 0
-    public void startTime() {}
+    public void startTime() {
+    }
 
     //EFFECTS: Return Time Elapsed
     public Timer getTime() {
@@ -21,11 +22,13 @@ public class Maze {
 
     //MODIFIES: this
     //EFFECTS: Pause Time
-    public void pauseTime() {}
+    public void pauseTime() {
+    }
 
     //MODIFIES: this
     //EFFECTS: Moves Player
-    public void movePlayer() {}
+    public void movePlayer() {
+    }
 
     //MODIFIES: this
     //EFFECTS: Returns Entire Grid
@@ -50,9 +53,11 @@ public class Maze {
 
     //MODIFIES: this
     //EFFECTS: End Maze Game(Reached Exit)
-    public void endGame() {}
+    public void endGame() {
+    }
 
     //MODIFIES: this
     //EFFECTS: Exit Maze
-    public void exitMaze() {}
+    public void exitMaze() {
+    }
 }
