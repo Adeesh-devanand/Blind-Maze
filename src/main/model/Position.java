@@ -1,4 +1,4 @@
-package model.maze;
+package model;
 
 public class Position {
     private int posX;

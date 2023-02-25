@@ -2,9 +2,7 @@
 
  */
 
-package model.maze;
-
-import java.util.ArrayList;
+package model;
 
 public class Grid {
     private int upperX;

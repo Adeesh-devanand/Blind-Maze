@@ -2,7 +2,7 @@
 
  */
 
-package model.maze;
+package model;
 
 public class MonsterControl {
     //REQUIRES: move should be a valid move

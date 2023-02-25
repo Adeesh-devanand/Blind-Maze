@@ -2,10 +2,10 @@
 
  */
 
-package model.maze;
+package model;
 
 public class Maze {
-    //EFFECTS: Creates blank Maze
+    //EFFECTS: Creates blank Maze with a given name
     public Maze(String name) {
         new Grid(10, 10);
     }
@@ -16,13 +16,17 @@ public class Maze {
     }
 
     //EFFECTS: Return Time Elapsed
-    public Timer getTime() {
+    public MazeTimer getTime() {
         return null;
     }
 
     //MODIFIES: this
     //EFFECTS: Pause Time
     public void pauseTime() {
+    }
+
+    public String getName() {
+        return "";
     }
 
     //MODIFIES: this
@@ -36,7 +40,7 @@ public class Maze {
         return null;
     }
 
-    //EFFECTS: Returns Grid around Player
+    //EFFECTS: Returns 5x5 Grid around Player
     public Grid returnPlayerGrid() {
         return null;
     }

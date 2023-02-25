@@ -1,7 +1,5 @@
 package model;
 
-import model.maze.Grid;
-import model.maze.Position;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
