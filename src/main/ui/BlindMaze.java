@@ -16,43 +16,53 @@ public class BlindMaze {
     private boolean playMode;
     private Scanner input = new Scanner(System.in);
     private ArrayList<Maze> mazeList;
+    private boolean flag = false;
 
+    //EFFECTS: initializes BlindMaze and runs the Menu till the user quits
     public BlindMaze() {
         input.useDelimiter("\n");
         mazeList = new ArrayList<>();
         playMode = true;
-        runMenu();
+        flag = false;
+
+        while (!flag) {
+            runMenu();
+        }
     }
 
+    //MODIFIES: this
+    //EFFECTS: opens the menu selection and takes action according to user input
+    @SuppressWarnings("methodlength")
     private void runMenu() {
         String choice = menuSelection();
         switch (choice) {
             case "o":
+            case "O":
                 if (mazeList.isEmpty()) {
                     System.out.println("Create a maze first");
-                    runMenu();
                 } else {
-                    Maze selectedMaze = selectMaze();
-                    openMaze(selectedMaze, playMode);
+                    selectMaze();
                 }
                 break;
             case "c":
+            case "C":
                 createMaze();
                 break;
             case "t":
+            case "T":
                 toggleMode();
                 break;
             case "q":
+            case "Q":
+                flag = true;
                 break;
             default:
                 System.out.println("Invalid input try again");
-                runMenu();
         }
     }
 
-
     //MODIFIES: this
-    //EFFECTS: Adds an empty maze to list of available mazes and opens it
+    //EFFECTS: Adds an empty maze to list of available mazes and opens it in edit mode
     private void createMaze() {
         String name;
 
@@ -75,7 +85,7 @@ public class BlindMaze {
     }
 
     //MODIFIES: this
-    //EFFECTS: Toggles state between Play and Toggle
+    //EFFECTS: Toggles the default mode between Play and Toggle
     private void toggleMode() {
         playMode = !playMode;
         if (playMode) {
@@ -85,10 +95,9 @@ public class BlindMaze {
         }
     }
 
-
     //REQUIRES: At least one Maze should be available
-    //EFFECTS: Makes the user choose a maze form the available mazes
-    private Maze selectMaze() {
+    //EFFECTS: prompts the user to open a maze form the available mazes
+    private void selectMaze() {
         System.out.println("List of available mazes");
         int count = 1;
         for (Maze maze : mazeList) {
@@ -96,8 +105,8 @@ public class BlindMaze {
             count++;
         }
 
-        System.out.println("Enter the maze number you want to open");
         Maze selectedMaze;
+        System.out.println("Enter the maze number you want to open");
 
         while (true) {
             try {
@@ -108,24 +117,39 @@ public class BlindMaze {
                 break;
 
             } catch (NumberFormatException ex) {
-
-                System.out.println("Value entered is not a integer, try again");
+                System.out.println("Value entered is not a number, try again");
 
             } catch (IndexOutOfBoundsException ex) {
-
-                System.out.println("There aren't that many mazes, try again");
+                System.out.println("Value entered isn't in range");
             }
         }
 
-        return selectedMaze;
+        openMaze(selectedMaze, playMode);
     }
 
-    //EFFECTS: opens a given maze
-    private void openMaze(Maze maze, boolean playMode) {
+    //REQUIRES: No other maze should be open
+    //EFFECTS:  connects the input feed with the maze corresponding to the mode
+    private void openMaze(Maze m, boolean playMode) {
+        System.out.println("Remember the exit is always at the bottom right");
+
+        if (playMode) {
+            openPlayMode(m);
+        } else {
+            openEditMode(m);
+        }
+    }
+
+    //EFFECTS: opens a maze in PlayMode;
+    private void openPlayMode(Maze m) {
 
     }
 
+    //EFFECTS: opens a maze in EditMode;
+    private void openEditMode(Maze m) {
 
+    }
+
+    //EFFECTS: prompts user to choose from one of the given option
     private String menuSelection() {
         System.out.println("\nSelect from:");
         System.out.println("\to -> open maze");

@@ -5,9 +5,13 @@
 package model;
 
 public class Maze {
+    private String name;
+    private Grid grid;
+
     //EFFECTS: Creates blank Maze with a given name
     public Maze(String name) {
-        new Grid(10, 10);
+        this.name = name;
+        grid = new Grid(10, 10);
     }
 
     //MODIFIES: this
@@ -26,12 +30,14 @@ public class Maze {
     }
 
     public String getName() {
-        return "";
+        return name;
     }
 
+    //REQUIRES: dir should be one of "left", "right", "up", "down"
     //MODIFIES: this
     //EFFECTS: Moves Player
-    public void movePlayer() {
+    public void movePlayer(String dir) {
+        grid.movePlayer(dir);
     }
 
     //MODIFIES: this
@@ -47,12 +53,12 @@ public class Maze {
 
     //EFFECTS: Returns Position of Player
     public Position returnPlayerPosition() {
-        return null;
+        return grid.getPlayerPos();
     }
 
     //EFFECTS: Returns Position of Monster
     public Position returnMonsterPosition() {
-        return null;
+        return grid.getMonsterPos();
     }
 
     //MODIFIES: this

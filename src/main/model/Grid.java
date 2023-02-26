@@ -59,6 +59,7 @@ public class Grid {
         monsterPos = new Position(x, y);
     }
 
+    //REQUIRES: dir should be one of "left", "right", "up", "down"
     //MODIFIES: this
     //EFFECTS: Moves Player on Grid if it is a valid move, else doesn't do anything
     public void movePlayer(String dir) {
