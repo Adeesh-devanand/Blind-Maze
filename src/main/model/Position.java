@@ -1,19 +1,19 @@
 package model;
 
 public class Position {
-    private int posX;
-    private int posY;
+    private final int posY;
+    private final int posX;
 
-    public Position(int x, int y) {
-        posX = x;
+    public Position(int y, int x) {
         posY = y;
-    }
-
-    public int getPosX() {
-        return posX;
+        posX = x;
     }
 
     public int getPosY() {
         return posY;
+    }
+
+    public int getPosX() {
+        return posX;
     }
 }

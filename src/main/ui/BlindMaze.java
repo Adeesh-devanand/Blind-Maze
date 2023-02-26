@@ -6,6 +6,7 @@ package ui;
 
 import model.Maze;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Set;
@@ -59,6 +60,19 @@ public class BlindMaze {
             default:
                 System.out.println("Invalid input try again");
         }
+    }
+
+    //EFFECTS: prompts user to choose from one of the given option
+    private String menuSelection() {
+        System.out.println("\nSelect from:");
+        System.out.println("\to -> open maze");
+        System.out.println("\tc -> create new maze");
+        System.out.println("\tt -> toggle mode");
+        System.out.println("\tq -> quit");
+
+        String choice = input.next();
+
+        return choice;
     }
 
     //MODIFIES: this
@@ -140,25 +154,96 @@ public class BlindMaze {
     }
 
     //EFFECTS: opens a maze in PlayMode;
+    //@SuppressWarnings("methodlength")
     private void openPlayMode(Maze m) {
+        boolean flag = true;
+        Maze maze = new Maze(m);
 
+        int gridSize = 3; //gridToBeDisplayed size
+        int[] position = maze.getPlayerPosition();
+        String[][] gridToBeDisplayed = new String[3][3];
+
+        while (flag) {
+            int[] playerPos =  maze.getPlayerPosition();
+
+            for (int row = 0; row < gridSize; row++) {
+                for (int col = 0; col < gridSize; col++) {
+                    try {
+                        gridToBeDisplayed[row][col] = maze.getStatus(row + playerPos[0] - 1,col + playerPos[1] - 1);
+                    } catch (IndexOutOfBoundsException e) {
+                        gridToBeDisplayed[row][col] = "~";
+                    }
+                }
+            }
+            displayGrid(gridToBeDisplayed);
+            String inp = input.next();
+            maze.movePlayer(inp);
+
+            if (inp.equals("q")) {
+                flag = false;
+            }
+        }
     }
 
     //EFFECTS: opens a maze in EditMode;
-    private void openEditMode(Maze m) {
+    @SuppressWarnings("methodlength")
+    private void openEditMode(Maze maze) {
+        boolean flag = true;
+        int gridSize = maze.getGridSize();
+        String[][] gridToBeDisplayed = new String[gridSize][gridSize];
 
+        Set<String> validInputs = Set.of("r", "l", "u", "d", "o", "p", "m", "q");
+        int[] cursor = new int[]{0, 0};
+
+        while (flag) {
+            for (int row = 0; row < gridSize; row++) {
+                for (int column = 0; column < gridSize; column++) {
+                    gridToBeDisplayed[row][column] = maze.getStatus(row, column);
+                }
+            }
+
+            displayGrid(gridToBeDisplayed);
+            String inp = input.next();
+
+            switch (inp) {
+                case "r":
+                    cursor[1]++;
+                    break;
+                case "l":
+                    cursor[1]--;
+                    break;
+                case "d":
+                    cursor[0]++;
+                    break;
+                case "u":
+                    cursor[0]--;
+                    break;
+                case "q":
+
+                    flag = false;
+                    break;
+                default:
+                    maze.placeEntity(cursor[0], cursor[1], inp);
+            }
+        }
     }
 
-    //EFFECTS: prompts user to choose from one of the given option
-    private String menuSelection() {
-        System.out.println("\nSelect from:");
-        System.out.println("\to -> open maze");
-        System.out.println("\tc -> create new maze");
-        System.out.println("\tt -> toggle mode");
-        System.out.println("\tq -> quit");
+    //EFFECTS: return a row for the grid
+//    private String[][] getGridToBeDisplayed() {
+//        for (int i = 0; i < gridSize; i++) {
+//            for (int j = 0; j < gridSize; j++) {
+//                gridToBeDisplayed[j][i] = maze.getStatus(i, j);
+//            }
+//        }
+//    }
 
-        String choice = input.next();
-
-        return choice;
+    //EFFECTS: displays the given grid on the display
+    private void displayGrid(String[][] gridToBeDisplayed) {
+        for (String[] row : gridToBeDisplayed) {
+            for (String column : row) {
+                System.out.print(column + " ");
+            }
+            System.out.println();
+        }
     }
 }

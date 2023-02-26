@@ -28,19 +28,19 @@ public class GridTest {
 
     @Test
     public void placeTest() {
-        assertEquals("empty", grid1.getStatus(p1));
-        assertEquals("empty", grid1.getStatus(p2));
+        assertEquals("E", grid1.getStatus(p1));
+        assertEquals("E", grid1.getStatus(p2));
 
-        assertEquals("empty", grid2.getStatus(p3));
-        assertEquals("empty", grid2.getStatus(p4));
+        assertEquals("E", grid2.getStatus(p3));
+        assertEquals("E", grid2.getStatus(p4));
 
         placeObjects();
 
-        assertEquals("obstacle", grid1.getStatus(p1));
-        assertEquals("monster", grid1.getStatus(p2));
+        assertEquals("O", grid1.getStatus(p1));
+        assertEquals("M", grid1.getStatus(p2));
 
-        assertEquals("obstacle", grid2.getStatus(p3));
-        assertEquals("player", grid2.getStatus(p4));
+        assertEquals("O", grid2.getStatus(p3));
+        assertEquals("P", grid2.getStatus(p4));
     }
 
     @Test
@@ -49,31 +49,31 @@ public class GridTest {
 
         Position new_p = new Position(4, 4);
 
-        assertEquals("empty", grid1.getStatus(new_p));
-        assertEquals("monster", grid1.getStatus(p2));
-        grid1.moveMonster("up");
-        assertEquals("monster", grid1.getStatus(new_p));
-        assertEquals("empty", grid1.getStatus(p2));
+        assertEquals("E", grid1.getStatus(new_p));
+        assertEquals("M", grid1.getStatus(p2));
+        grid1.moveMonster("L");
+        assertEquals("M", grid1.getStatus(new_p));
+        assertEquals("E", grid1.getStatus(p2));
 
         new_p = new Position(2, 5);
 
-        assertEquals("empty", grid2.getStatus(new_p));
-        assertEquals("player", grid2.getStatus(p4));
-        grid2.movePlayer("down");
-        grid2.movePlayer("down");
+        assertEquals("E", grid2.getStatus(new_p));
+        assertEquals("P", grid2.getStatus(p4));
+        grid2.movePlayer("R");
+        grid2.movePlayer("R");
         //Trying to move against edge
-        grid2.movePlayer("down");
-        assertEquals("player", grid2.getStatus(new_p));
-        assertEquals("empty", grid2.getStatus(p4));
+        grid2.movePlayer("R");
+        assertEquals("P", grid2.getStatus(new_p));
+        assertEquals("E", grid2.getStatus(p4));
 
         new_p = new Position(4, 5);
 
-        assertEquals("empty", grid2.getStatus(new_p));
-        grid2.movePlayer("right");
-        grid2.movePlayer("right");
+        assertEquals("E", grid2.getStatus(new_p));
+        grid2.movePlayer("D");
+        grid2.movePlayer("D");
         //Trying to move against obstacle
-        grid2.movePlayer("right");
-        assertEquals("player", grid2.getStatus(new_p));
+        grid2.movePlayer("D");
+        assertEquals("P", grid2.getStatus(new_p));
     }
 
     public void placeObjects() {
