@@ -7,7 +7,7 @@ package model;
 public class Maze {
     private final String name;
     private final int gridSize;
-    private Grid grid;
+    private final Grid grid;
 
     //EFFECTS: Creates a blank Maze with a given name
     public Maze(String name) {
@@ -24,8 +24,7 @@ public class Maze {
     //EFFECTS: Creates a deep copy of the given Maze
     public Maze(Maze oldMaze) {
         this.name = oldMaze.name; //you can access
-        Grid oldGrid = oldMaze.grid; //you can access
-        this.grid = new Grid(oldGrid);
+        this.grid = new Grid(oldMaze.grid);//you can access
         this.gridSize = oldMaze.getGridSize();
     }
 
@@ -33,6 +32,8 @@ public class Maze {
     //EFFECTS: - moves player on the grid if it is a valid move,
     //         - returns whether the player made contact with the monster
     public boolean movePlayer(String dir) {
+        grid.movePlayer(dir);
+
         Position monsterP = grid.getMonsterPos();
         int monsterY = monsterP.getPosX();
         int monsterX = monsterP.getPosX();
@@ -41,12 +42,7 @@ public class Maze {
         int playerY = playerP.getPosY();
         int playerX = playerP.getPosX();
 
-        grid.movePlayer(dir);
-        if (monsterY == playerY && monsterX == playerX) {
-            return true;
-        } else {
-            return false;
-        }
+        return monsterY == playerY && monsterX == playerX;
     }
 
     //TODO: Need to add OutOfBoundsException similar to getStatus() method
@@ -90,7 +86,6 @@ public class Maze {
     //EFFECTS: returns the position of the player
     public int[] getPlayerPosition() {
         Position p = grid.getPlayerPos();
-        Position monsterP = grid.getMonsterPos();
         return new int[]{p.getPosY(), p.getPosX()};
     }
 

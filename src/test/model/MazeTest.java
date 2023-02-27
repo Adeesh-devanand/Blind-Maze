@@ -10,6 +10,8 @@ public class MazeTest {
     Maze m2;
     Maze m3;
 
+    private final int defaultGridSize = 10;
+
     @BeforeEach
     public void setup(){
         m1 = new Maze("MyFirstMaze");
@@ -36,5 +38,20 @@ public class MazeTest {
         assertEquals("m", m2.getStatus(2, 2));
         boolean result = m2.movePlayer("d");
         assertTrue(result);
+    }
+
+    @Test
+    public void placeEntityTest() throws ElementAlreadyExistsException {
+        assertEquals("p", m2.getStatus(0, 0));
+        assertEquals("e", m2.getStatus(1, 0));
+        m2.placeEntity(1, 0, "p");
+        assertEquals("e", m2.getStatus(0, 0));
+        assertEquals("p", m2.getStatus(1, 0));
+
+        assertEquals("m", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
+        assertEquals("e", m3.getStatus(1, 3));
+        m3.placeEntity(1, 3, "m");
+        assertEquals("e", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
+        assertEquals("m", m3.getStatus(1, 3));
     }
 }

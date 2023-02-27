@@ -7,7 +7,7 @@ package model;
 public class Grid {
     private final int upperX;
     private final int upperY;
-    private int[][] grid;
+    private final int[][] grid;
 
     private Position playerPos;
     private Position monsterPos;
@@ -20,7 +20,7 @@ public class Grid {
         grid = new int[y][x];
 
         playerPos = new Position(0, 0);
-        monsterPos = new Position(y, x);
+        monsterPos = new Position(y - 1, x - 1);
 
         for (int i = 0; i < y; i++) {
             for (int j = 0; j < x; j++) {
@@ -37,10 +37,9 @@ public class Grid {
         this.upperY = oldGrid.upperY; //you can access
         this.upperX = oldGrid.upperX; //you can access
         this.grid = new int[upperY][upperX];
-        int[][] old = oldGrid.grid;
 
         for (int i = 0; i < this.upperY; i++) {
-            System.arraycopy(old[i], 0, this.grid[i], 0, this.upperX);
+            System.arraycopy(oldGrid.grid[i], 0, this.grid[i], 0, this.upperX);
         }
 
         //Position can't be modified after initialized so
@@ -69,6 +68,7 @@ public class Grid {
         playerPos = new Position(y, x);
     }
 
+    //TODO: resolve conflict when monster and player collide
     //MODIFIES: this
     //EFFECTS: Moves Player on Grid if it is a valid move, else doesn't do anything
     public void movePlayer(String dir) {
@@ -130,9 +130,11 @@ public class Grid {
         return elementString;
     }
 
+    //TODO: resolve conflict when monster and player collide
+    //TODO: TEMP-EFFECTS: moves an entity on the map if there is no obstacle
     //REQUIRES: entity should be the integer encoding for an entity
     //MODIFIES: this
-    //EFFECTS: Moves a given entity on the map if it is possible, and gives the new position
+    //EFFECTS: moves an entity on the map if there is no other element present, and returns the new position
     @SuppressWarnings("methodlength")
     private Position moveEntity(String dir, Position oldPos, int entity) {
         int oldY = oldPos.getPosY();
@@ -142,20 +144,20 @@ public class Grid {
 
         switch (dir) {
             case "r":
-                newX += 1;
+                newX++;
                 break;
             case "l":
-                newX -= 1;
+                newX--;
                 break;
             case "u":
-                newY -= 1;
+                newY--;
                 break;
             case "d":
-                newY += 1;
+                newY++;
             default:
         }
 
-        if (newX >= 0 && newY >= 0 && newX < upperX && newY < upperY && grid[newY][newX] == 0) {
+        if (newX >= 0 && newY >= 0 && newX < upperX && newY < upperY && grid[newY][newX] != 1) {
             grid[oldY][oldX] = 0;
             grid[newY][newX] = entity;
             return new Position(newY, newX);
