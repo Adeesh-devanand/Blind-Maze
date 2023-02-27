@@ -60,6 +60,8 @@ public class GridTest {
         assertEquals("e", grid2.getStatus(new_p));
         assertEquals("p", grid2.getStatus(p4));
         grid2.movePlayer("r");
+        grid1.moveMonster("l");
+        grid1.moveMonster("r");
         grid2.movePlayer("r");
         //Trying to move against edge
         grid2.movePlayer("r");
