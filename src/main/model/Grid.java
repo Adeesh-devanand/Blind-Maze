@@ -13,7 +13,7 @@ public class Grid {
     private Position monsterPos;
 
 
-    //EFFECTS: Creates an Empty Grid of size (y by x)
+    //EFFECTS: Creates an Empty Grid of size (y down by x across)
     public Grid(int y, int x) {
         upperY = y;
         upperX = x;
@@ -32,7 +32,7 @@ public class Grid {
         grid[y - 1][x - 1] = 3;
     }
 
-    //EFFECTS: Returns a copy of the given Grid object
+    //EFFECTS: Creates a copy of the given Grid object
     public Grid(Grid oldGrid) {
         this.upperY = oldGrid.upperY; //you can access
         this.upperX = oldGrid.upperX; //you can access
@@ -49,19 +49,18 @@ public class Grid {
         this.monsterPos = oldGrid.monsterPos;
     }
 
-    //REQUIRES: Position p should be < Grid size, and empty
+    //REQUIRES: Position p should be empty, and be within grid limits
     //MODIFIES: this
-    //EFFECTS: Places Obstacle on Grid
+    //EFFECTS: Places Obstacle on grid at given position
     public void placeObstacle(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
         grid[y][x] = 1;
     }
 
-    //REQUIRES: Position p should be < Grid size, and empty
-    //
+    //REQUIRES: Position p should be empty, and be within grid limits
     //MODIFIES: this
-    //EFFECTS: Places Player on Grid
+    //EFFECTS: Places Player on grid at given position
     public void placePlayer(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
@@ -70,9 +69,21 @@ public class Grid {
         playerPos = new Position(y, x);
     }
 
-    //REQUIRES: Position p should be < Grid size, and empty
     //MODIFIES: this
-    //EFFECTS: Places Monster on Grid
+    //EFFECTS: Moves Player on Grid if it is a valid move, else doesn't do anything
+    public void movePlayer(String dir) {
+        Position playerPos = getPlayerPos();
+        this.playerPos = moveEntity(dir, playerPos, 2);
+    }
+
+    //EFFECTS: returns Position of Player
+    public Position getPlayerPos() {
+        return playerPos;
+    }
+
+    //REQUIRES: Position p should be empty, and be within grid limits
+    //MODIFIES: this
+    //EFFECTS: Places Monster on grid at given position
     public void placeMonster(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
@@ -81,31 +92,11 @@ public class Grid {
         monsterPos = new Position(y, x);
     }
 
-    //REQUIRES: dir should be one of "l", "r", "u", "d"
     //MODIFIES: this
     //EFFECTS: Moves Player on Grid if it is a valid move, else doesn't do anything
-    public void movePlayer(String dir) {
-        Position playerPos = getPlayerPos();
-        int oldY = playerPos.getPosY();
-        int oldX = playerPos.getPosX();
-
-        this.playerPos = moveEntity(dir, oldY, oldX, 2);
-    }
-
-    //REQUIRES: should be a valid move ~otherwise monster might get stuck~
-    //MODIFIES: this
-    //EFFECTS: Moves Monster on Grid
     public void moveMonster(String dir) {
         Position monsterPos = getMonsterPos();
-        int oldY = monsterPos.getPosY();
-        int oldX = monsterPos.getPosX();
-
-        this.monsterPos = moveEntity(dir, oldY, oldX, 3);
-    }
-
-    //EFFECTS: returns Position of Player
-    public Position getPlayerPos() {
-        return playerPos;
+        this.monsterPos = moveEntity(dir, monsterPos, 3);
     }
 
     //EFFECTS: returns Position of Monster
@@ -113,15 +104,9 @@ public class Grid {
         return monsterPos;
     }
 
-    //EFFECTS: Clears the cell
-    public void clearCell(Position p) {
-        int y = p.getPosY();
-        int x = p.getPosX();
-        grid[y][x] = 0;
-    }
-
+    //REQUIRES: Position is withing grid limits
     //EFFECTS: returns the status at given grid Position
-    //String is one of "o", "p", "m", "e"
+    //String is one of "o", "p", "m", "e"//
     public String getStatus(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
@@ -145,7 +130,13 @@ public class Grid {
         return elementString;
     }
 
-    private Position moveEntity(String dir, int oldY, int oldX, int entity) {
+    //REQUIRES: entity should be the integer encoding for an entity
+    //MODIFIES: this
+    //EFFECTS: Moves a given entity on the map if it is possible, and gives the new position
+    @SuppressWarnings("methodlength")
+    private Position moveEntity(String dir, Position oldPos, int entity) {
+        int oldY = oldPos.getPosY();
+        int oldX = oldPos.getPosX();
         int newY = oldY;
         int newX = oldX;
 
@@ -162,7 +153,6 @@ public class Grid {
             case "d":
                 newY += 1;
             default:
-                break;
         }
 
         if (newX >= 0 && newY >= 0 && newX < upperX && newY < upperY && grid[newY][newX] == 0) {
@@ -174,6 +164,16 @@ public class Grid {
         return new Position(oldY, oldX);
     }
 
+    //REQUIRES: p shouldn't be the position of a player or monster
+    //MODIFIES: this
+    //EFFECTS: Clears the Position on the grid
+    public void clearCell(Position p) {
+        int y = p.getPosY();
+        int x = p.getPosX();
+        grid[y][x] = 0;
+    }
+
+    //EFFECTS: returns if the given position is empty or not
     public boolean isEmpty(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();

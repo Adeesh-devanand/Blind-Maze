@@ -6,8 +6,8 @@ package model;
 
 public class Maze {
     private final String name;
-    private Grid grid;
     private final int gridSize;
+    private Grid grid;
 
     //EFFECTS: Creates a blank Maze with a given name
     public Maze(String name) {
@@ -21,7 +21,7 @@ public class Maze {
         grid = new Grid(gridSize, gridSize);
     }
 
-    //EFFECTS: Creates a copy of the Maze
+    //EFFECTS: Creates a deep copy of the given Maze
     public Maze(Maze oldMaze) {
         this.name = oldMaze.name; //you can access
         Grid oldGrid = oldMaze.grid; //you can access
@@ -30,19 +30,29 @@ public class Maze {
     }
 
     //MODIFIES: this
-    //EFFECTS: Moves Player
+    //EFFECTS: - moves player on the grid if it is a valid move,
+    //         - returns whether the player made contact with the monster
     public boolean movePlayer(String dir) {
         Position monsterP = grid.getMonsterPos();
+        int monsterY = monsterP.getPosX();
+        int monsterX = monsterP.getPosX();
+
         Position playerP = grid.getPlayerPos();
-        if (playerP.equals(monsterP)) {
+        int playerY = playerP.getPosY();
+        int playerX = playerP.getPosX();
+
+        grid.movePlayer(dir);
+        if (monsterY == playerY && monsterX == playerX) {
             return true;
         } else {
-            grid.movePlayer(dir);
             return false;
         }
     }
 
-
+    //TODO: Need to add OutOfBoundsException similar to getStatus() method
+    //REQUIRES: y, and x should be in the grid limit
+    //MODIFIES: this
+    //EFFECTS: places an entity on the grid
     public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException {
         Position p = new Position(y, x);
         switch (entity) {
@@ -77,13 +87,15 @@ public class Maze {
         return gridSize;
     }
 
-    //EFFECTS: Returns Position of Player in Column i.e. (x) first, Row i.e.(y) second fashion
+    //EFFECTS: returns the position of the player
     public int[] getPlayerPosition() {
         Position p = grid.getPlayerPos();
         Position monsterP = grid.getMonsterPos();
         return new int[]{p.getPosY(), p.getPosX()};
     }
 
+    //EFFECTS: returns the entity at the position
+    //         - [e, o, p, m] for empty, object, player, and monster
     public String getStatus(int y, int x) throws IndexOutOfBoundsException {
         if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
             throw new IndexOutOfBoundsException();

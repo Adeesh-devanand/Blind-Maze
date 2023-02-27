@@ -25,8 +25,12 @@ algorithms.
 
 ## User Stories
 
-- As a user, I want to be able to add new mazes to my list of available mazes
-- As a user, I want to be able to view my available mazes 
+- As a user in the menu, I want to be able to add new mazes to my Menu
+- As a user in the menu, I want to be able to view my available mazes 
 - As a user, I want to be able to remove a maze from my available mazes
-- As a user, I want to be able to select one maze to work with
-- As a user who has selected a map, I want to be able to toggle between edit and play mode
+- As a user in the menu, I want to be able to select one maze to work with
+- As a user in the menu, I want to be able to toggle between edit and play mode
+- As a user in the menu, I want to be able to quit
+- As a user opening a maze in edit mode, I want to be able to place entities on my maze
+- As a user opening a maze in play mode, I want to be able to move my player around
+- As a user opening a maze in play mode, I want to be able to be able to quit

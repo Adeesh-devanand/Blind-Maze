@@ -186,7 +186,7 @@ public class BlindMaze {
                 maze.placeEntity(cursor[0], cursor[1], inp);
             } catch (ElementAlreadyExistsException e) {
                 System.out.println("Can't place object there");
-                System.out.println("Enter any key");
+                System.out.println("Enter any key to try again");
                 input.next();
             }
             if (inp.equals("q")) {
