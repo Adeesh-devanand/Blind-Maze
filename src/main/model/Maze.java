@@ -30,38 +30,37 @@ public class Maze {
     }
 
     //MODIFIES: this
-    //EFFECTS: Starts time from 0
-    public void startTime() {
-    }
-
-    //EFFECTS: Return Time Elapsed
-    public MazeTimer getTime() {
-        return null;
-    }
-
-    //MODIFIES: this
-    //EFFECTS: Pause Time
-    public void pauseTime() {
-    }
-
-    //MODIFIES: this
     //EFFECTS: Moves Player
-    public void movePlayer(String dir) {
-        grid.movePlayer(dir);
+    public boolean movePlayer(String dir) {
+        Position monsterP = grid.getMonsterPos();
+        Position playerP = grid.getPlayerPos();
+        if (playerP.equals(monsterP)) {
+            return true;
+        } else {
+            grid.movePlayer(dir);
+            return false;
+        }
     }
 
 
-    public void placeEntity(int y, int x, String entity) {
+    public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException {
         Position p = new Position(y, x);
         switch (entity) {
             case "p":
-                grid.placePlayer(p);
-                break;
             case "o":
-                grid.placeObstacle(p);
-                break;
             case "m":
-                grid.placeMonster(p);
+                if (!grid.isEmpty(p)) {
+                    throw new ElementAlreadyExistsException();
+                }
+                if (entity.equals("o")) {
+                    grid.placeObstacle(p);
+                } else if (entity.equals("m")) {
+                    grid.clearCell(grid.getMonsterPos());
+                    grid.placeMonster(p);
+                } else {
+                    grid.clearCell(grid.getPlayerPos());
+                    grid.placePlayer(p);
+                }
                 break;
             default:
                 break;
@@ -81,34 +80,15 @@ public class Maze {
     //EFFECTS: Returns Position of Player in Column i.e. (x) first, Row i.e.(y) second fashion
     public int[] getPlayerPosition() {
         Position p = grid.getPlayerPos();
-        int[] arr = {p.getPosY(), p.getPosX()};
-        return arr;
+        Position monsterP = grid.getMonsterPos();
+        return new int[]{p.getPosY(), p.getPosX()};
     }
 
-//    //EFFECTS: Returns Position of Monster
-//    public int[] getMonsterPosition() {
-//        Position p = grid.getMonsterPos();
-//        int[] arr = {p.getPosY(), p.getPosX()};
-//        return arr;
-//    }
-
-    //EFFECTS: returns the status at given grid Position
-    //String is one of "obstacle", "player", "monster", "empty"
     public String getStatus(int y, int x) throws IndexOutOfBoundsException {
         if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
             throw new IndexOutOfBoundsException();
         }
         Position p = new Position(y, x);
         return grid.getStatus(p);
-    }
-
-    //MODIFIES: this
-    //EFFECTS: End Maze Game(Reached Exit)
-    public void endGame() {
-    }
-
-    //MODIFIES: this
-    //EFFECTS: Exit Maze
-    public void exitMaze() {
     }
 }

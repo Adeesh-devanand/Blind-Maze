@@ -5,8 +5,8 @@
 package model;
 
 public class Grid {
-    private int upperX;
-    private int upperY;
+    private final int upperX;
+    private final int upperY;
     private int[][] grid;
 
     private Position playerPos;
@@ -17,14 +17,19 @@ public class Grid {
     public Grid(int y, int x) {
         upperY = y;
         upperX = x;
-
         grid = new int[y][x];
+
+        playerPos = new Position(0, 0);
+        monsterPos = new Position(y, x);
 
         for (int i = 0; i < y; i++) {
             for (int j = 0; j < x; j++) {
                 grid[i][j] = 0;
             }
         }
+
+        grid[0][0] = 2;
+        grid[y - 1][x - 1] = 3;
     }
 
     //EFFECTS: Returns a copy of the given Grid object
@@ -35,9 +40,7 @@ public class Grid {
         int[][] old = oldGrid.grid;
 
         for (int i = 0; i < this.upperY; i++) {
-            for (int j = 0; j < this.upperX; j++) {
-                this.grid[i][j] = old[i][j];
-            }
+            System.arraycopy(old[i], 0, this.grid[i], 0, this.upperX);
         }
 
         //Position can't be modified after initialized so
@@ -110,29 +113,36 @@ public class Grid {
         return monsterPos;
     }
 
+    //EFFECTS: Clears the cell
+    public void clearCell(Position p) {
+        int y = p.getPosY();
+        int x = p.getPosX();
+        grid[y][x] = 0;
+    }
+
     //EFFECTS: returns the status at given grid Position
     //String is one of "o", "p", "m", "e"
     public String getStatus(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
         int elementInt = grid[y][x];
-        String elementS;
+        String elementString;
 
         switch (elementInt) {
             case 0:
-                elementS = "e";
+                elementString = "e";
                 break;
             case 1:
-                elementS = "o";
+                elementString = "o";
                 break;
             case 2:
-                elementS = "p";
+                elementString = "p";
                 break;
             default:
-                elementS = "m";
+                elementString = "m";
         }
 
-        return elementS;
+        return elementString;
     }
 
     private Position moveEntity(String dir, int oldY, int oldX, int entity) {
@@ -162,5 +172,12 @@ public class Grid {
         }
 
         return new Position(oldY, oldX);
+    }
+
+    public boolean isEmpty(Position p) {
+        int y = p.getPosY();
+        int x = p.getPosX();
+        int elementInt = grid[y][x];
+        return elementInt == 0;
     }
 }

@@ -4,23 +4,24 @@
 
 package ui;
 
+import model.ElementAlreadyExistsException;
 import model.Maze;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class BlindMaze {
+    private static final int PLAYER_VISIBILITY = 1;
+    private static Scanner input;
+    private static boolean flag;
 
     private boolean playMode;
-    private Scanner input = new Scanner(System.in);
     private ArrayList<Maze> mazeList;
-    private boolean flag = false;
 
     //EFFECTS: initializes BlindMaze and runs the Menu till the user quits
     public BlindMaze() {
+        input = new Scanner(System.in);
         input.useDelimiter("\n");
         mazeList = new ArrayList<>();
         playMode = true;
@@ -33,12 +34,10 @@ public class BlindMaze {
 
     //MODIFIES: this
     //EFFECTS: opens the menu selection and takes action according to user input
-    @SuppressWarnings("methodlength")
     private void runMenu() {
         String choice = menuSelection();
         switch (choice) {
             case "o":
-            case "O":
                 if (mazeList.isEmpty()) {
                     System.out.println("Create a maze first");
                 } else {
@@ -46,15 +45,12 @@ public class BlindMaze {
                 }
                 break;
             case "c":
-            case "C":
                 createMaze();
                 break;
             case "t":
-            case "T":
                 toggleMode();
                 break;
             case "q":
-            case "Q":
                 flag = true;
                 break;
             default:
@@ -70,9 +66,7 @@ public class BlindMaze {
         System.out.println("\tt -> toggle mode");
         System.out.println("\tq -> quit");
 
-        String choice = input.next();
-
-        return choice;
+        return input.next();
     }
 
     //MODIFIES: this
@@ -142,7 +136,7 @@ public class BlindMaze {
     }
 
     //REQUIRES: No other maze should be open
-    //EFFECTS:  connects the input feed with the maze corresponding to the mode
+    //EFFECTS:  connects the input feed with the maze, takes mode into count to the mode
     private void openMaze(Maze m, boolean playMode) {
         System.out.println("Remember the exit is always at the bottom right");
 
@@ -154,88 +148,72 @@ public class BlindMaze {
     }
 
     //EFFECTS: opens a maze in PlayMode;
-    //@SuppressWarnings("methodlength")
     private void openPlayMode(Maze m) {
-        boolean flag = true;
+        boolean flag = false;
+        int gridSize = PLAYER_VISIBILITY + 2;
+        int[] playerPos;
+        String[][] gridToBeDisplayed;
         Maze maze = new Maze(m);
-
-        int gridSize = 3; //gridToBeDisplayed size
-        int[] position = maze.getPlayerPosition();
-        String[][] gridToBeDisplayed = new String[3][3];
-
-        while (flag) {
-            int[] playerPos =  maze.getPlayerPosition();
-
-            for (int row = 0; row < gridSize; row++) {
-                for (int col = 0; col < gridSize; col++) {
-                    try {
-                        gridToBeDisplayed[row][col] = maze.getStatus(row + playerPos[0] - 1,col + playerPos[1] - 1);
-                    } catch (IndexOutOfBoundsException e) {
-                        gridToBeDisplayed[row][col] = "~";
-                    }
-                }
-            }
+        boolean finished;
+        while (!flag) {
+            playerPos  =  maze.getPlayerPosition();
+            gridToBeDisplayed = getGridTOBeDisplayed(maze, gridSize, playerPos[0] - 1, playerPos[1] - 1);
             displayGrid(gridToBeDisplayed);
             String inp = input.next();
-            maze.movePlayer(inp);
-
+            finished = maze.movePlayer(inp);
+            if (finished) {
+                System.out.println("YOU WON!!!!!");
+                flag = true;
+            }
             if (inp.equals("q")) {
-                flag = false;
+                flag = true;
             }
         }
     }
 
     //EFFECTS: opens a maze in EditMode;
-    @SuppressWarnings("methodlength")
     private void openEditMode(Maze maze) {
-        boolean flag = true;
-        int gridSize = maze.getGridSize();
-        String[][] gridToBeDisplayed = new String[gridSize][gridSize];
-
-        Set<String> validInputs = Set.of("r", "l", "u", "d", "o", "p", "m", "q");
+        boolean flag = false;
+        String[][] gridToBeDisplayed;
         int[] cursor = new int[]{0, 0};
 
-        while (flag) {
-            for (int row = 0; row < gridSize; row++) {
-                for (int column = 0; column < gridSize; column++) {
-                    gridToBeDisplayed[row][column] = maze.getStatus(row, column);
-                }
-            }
-
+        while (!flag) {
+            gridToBeDisplayed = getGridToBeDisplayed(maze);
             displayGrid(gridToBeDisplayed);
             String inp = input.next();
-
-            switch (inp) {
-                case "r":
-                    cursor[1]++;
-                    break;
-                case "l":
-                    cursor[1]--;
-                    break;
-                case "d":
-                    cursor[0]++;
-                    break;
-                case "u":
-                    cursor[0]--;
-                    break;
-                case "q":
-
-                    flag = false;
-                    break;
-                default:
-                    maze.placeEntity(cursor[0], cursor[1], inp);
+            updateCursor(inp, cursor);
+            try {
+                maze.placeEntity(cursor[0], cursor[1], inp);
+            } catch (ElementAlreadyExistsException e) {
+                System.out.println("Can't place object there");
+                System.out.println("Enter any key");
+                input.next();
+            }
+            if (inp.equals("q")) {
+                flag = true;
             }
         }
     }
 
-    //EFFECTS: return a row for the grid
-//    private String[][] getGridToBeDisplayed() {
-//        for (int i = 0; i < gridSize; i++) {
-//            for (int j = 0; j < gridSize; j++) {
-//                gridToBeDisplayed[j][i] = maze.getStatus(i, j);
-//            }
-//        }
-//    }
+    private String[][] getGridToBeDisplayed(Maze maze) {
+        int gridSize = maze.getGridSize();
+        return getGridTOBeDisplayed(maze, gridSize, 0, 0);
+    }
+
+    private String[][] getGridTOBeDisplayed(Maze maze, int gridSize, int relY, int relX) {
+        String[][] gridToBeDisplayed = new String[gridSize][gridSize];
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col < gridSize; col++) {
+                try {
+                    gridToBeDisplayed[row][col] = maze.getStatus(row + relY,col + relX);
+                } catch (IndexOutOfBoundsException e) {
+                    gridToBeDisplayed[row][col] = "~";
+                }
+            }
+        }
+
+        return gridToBeDisplayed;
+    }
 
     //EFFECTS: displays the given grid on the display
     private void displayGrid(String[][] gridToBeDisplayed) {
@@ -244,6 +222,25 @@ public class BlindMaze {
                 System.out.print(column + " ");
             }
             System.out.println();
+        }
+    }
+
+    private void updateCursor(String inp, int[] cursor) {
+        switch (inp) {
+            case "r":
+                cursor[1]++;
+                break;
+            case "l":
+                cursor[1]--;
+                break;
+            case "d":
+                cursor[0]++;
+                break;
+            case "u":
+                cursor[0]--;
+                break;
+            default:
+                break;
         }
     }
 }
