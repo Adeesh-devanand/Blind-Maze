@@ -1,5 +1,7 @@
 package model;
 
+import model.exceptions.ElementAlreadyExistsException;
+import model.exceptions.OutOfBoundsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +22,7 @@ public class MazeTest {
     }
 
     @Test
-    public void movePlayerTest(){
+    public void movePlayerTest() throws OutOfBoundsException {
         assertEquals("p", m2.getStatus(0, 0));
         assertEquals("e", m2.getStatus(1, 0));
         assertEquals("e", m2.getStatus(1, 1));
@@ -41,7 +43,7 @@ public class MazeTest {
     }
 
     @Test
-    public void placeEntityTest() throws ElementAlreadyExistsException {
+    public void placeEntityTest() throws OutOfBoundsException, ElementAlreadyExistsException {
         assertEquals("p", m2.getStatus(0, 0));
         assertEquals("e", m2.getStatus(1, 0));
         m2.placeEntity(1, 0, "p");

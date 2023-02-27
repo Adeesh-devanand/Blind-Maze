@@ -1,8 +1,12 @@
 /*
-
- */
+* A typical controller, handles all interaction between UI, and the model
+* the UI is only dependent on this class in the model package, all instructions
+* to the model are fed through this class */
 
 package model;
+
+import model.exceptions.ElementAlreadyExistsException;
+import model.exceptions.OutOfBoundsException;
 
 public class Maze {
     private final String name;
@@ -55,7 +59,7 @@ public class Maze {
             case "p":
             case "o":
             case "m":
-                if (!grid.isEmpty(p)) {
+                if (!grid.isCellEmpty(p)) {
                     throw new ElementAlreadyExistsException();
                 }
                 if (entity.equals("o")) {
@@ -91,9 +95,9 @@ public class Maze {
 
     //EFFECTS: returns the entity at the position
     //         - [e, o, p, m] for empty, object, player, and monster
-    public String getStatus(int y, int x) throws IndexOutOfBoundsException {
+    public String getStatus(int y, int x) throws OutOfBoundsException {
         if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
-            throw new IndexOutOfBoundsException();
+            throw new OutOfBoundsException();
         }
         Position p = new Position(y, x);
         return grid.getStatus(p);

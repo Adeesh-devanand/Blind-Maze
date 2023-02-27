@@ -1,26 +1,32 @@
 /*
+* Controls all the interactions between the model and the User
+* Responsible for the Console based GUI
+* Displays a menu from where user prompts funnel the user through the application
+* Acts as both a controller and a View class */
 
- */
+//TODO: for GUI approach, remove all View functionalities and treat it as a controller
 
 package ui;
 
-import model.ElementAlreadyExistsException;
+import model.exceptions.ElementAlreadyExistsException;
 import model.Maze;
+import model.exceptions.OutOfBoundsException;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class BlindMaze {
+public class Application {
     private static final int PLAYER_VISIBILITY = 1;
     private static Scanner input;
     private static boolean flag;
 
     private boolean playMode;
-    private ArrayList<Maze> mazeList;
+    private final ArrayList<Maze> mazeList;
 
-    //EFFECTS: initializes BlindMaze and runs the Menu till the user quits
-    public BlindMaze() {
+    //EFFECTS: initializes the Application and runs the Menu till the user quits
+    public Application() {
         input = new Scanner(System.in);
         input.useDelimiter("\n");
         mazeList = new ArrayList<>();
@@ -70,7 +76,7 @@ public class BlindMaze {
     }
 
     //MODIFIES: this
-    //EFFECTS: Adds an empty maze to list of available mazes and opens it in edit mode
+    //EFFECTS: Adds an empty maze to a list of available mazes and opens it in edit mode
     private void createMaze() {
         String name;
 
@@ -104,6 +110,7 @@ public class BlindMaze {
     }
 
     //REQUIRES: At least one Maze should be available
+    //MODIFIES: this
     //EFFECTS: prompts the user to open a maze form the available mazes
     private void selectMaze() {
         System.out.println("List of available mazes");
@@ -135,8 +142,8 @@ public class BlindMaze {
         openMaze(selectedMaze, playMode);
     }
 
-    //REQUIRES: No other maze should be open
-    //EFFECTS:  connects the input feed with the maze, takes mode into count to the mode
+    //MODIFIES: maze
+    //EFFECTS: opens the given maze in the selected mode
     private void openMaze(Maze m, boolean playMode) {
         System.out.println("Remember the exit is always at the bottom right");
 
@@ -147,13 +154,14 @@ public class BlindMaze {
         }
     }
 
-    //EFFECTS: opens a maze in PlayMode;
-    private void openPlayMode(Maze m) {
+    //MODIFIES: maze
+    //EFFECTS: opens the given maze in PlayMode;
+    private void openPlayMode(Maze maze) {
         boolean flag = false;
         int gridSize = PLAYER_VISIBILITY + 2;
         int[] playerPos;
         String[][] gridToBeDisplayed;
-        Maze maze = new Maze(m);
+        maze = new Maze(maze);
         boolean finished;
         while (!flag) {
             playerPos  =  maze.getPlayerPosition();
@@ -162,7 +170,7 @@ public class BlindMaze {
             String inp = input.next();
             finished = maze.movePlayer(inp);
             if (finished) {
-                System.out.println("YOU WON!!!!!");
+                System.out.println("****YOU WON****");
                 flag = true;
             }
             if (inp.equals("q")) {
@@ -171,7 +179,8 @@ public class BlindMaze {
         }
     }
 
-    //EFFECTS: opens a maze in EditMode;
+    //MODIFIES: maze
+    //EFFECTS: opens the given maze in EditMode;
     private void openEditMode(Maze maze) {
         boolean flag = false;
         String[][] gridToBeDisplayed;
@@ -195,18 +204,20 @@ public class BlindMaze {
         }
     }
 
+    //EFFECTS: returns the entire maze grid
     private String[][] getGridToBeDisplayed(Maze maze) {
         int gridSize = maze.getGridSize();
         return getGridTOBeDisplayed(maze, gridSize, 0, 0);
     }
 
+    //EFFECTS: returns the maze grid according to the given size, and relative to the player
     private String[][] getGridTOBeDisplayed(Maze maze, int gridSize, int relY, int relX) {
         String[][] gridToBeDisplayed = new String[gridSize][gridSize];
         for (int row = 0; row < gridSize; row++) {
             for (int col = 0; col < gridSize; col++) {
                 try {
                     gridToBeDisplayed[row][col] = maze.getStatus(row + relY,col + relX);
-                } catch (IndexOutOfBoundsException e) {
+                } catch (OutOfBoundsException e) {
                     gridToBeDisplayed[row][col] = "~";
                 }
             }
@@ -225,8 +236,9 @@ public class BlindMaze {
         }
     }
 
-    private void updateCursor(String inp, int[] cursor) {
-        switch (inp) {
+    //EFFECTS: moves the cursor according to the direction
+    private void updateCursor(String dir, int[] cursor) {
+        switch (dir) {
             case "r":
                 cursor[1]++;
                 break;

@@ -1,6 +1,10 @@
 /*
-
- */
+* Handles all the computation and back-end functioning
+* keeps a track of the grid for the maze along with the elements and their respective positions
+*
+* NOTE: All positions start from the top left corner i.e top left is (0, 0)
+* 'y' represents the y axes and comes first unlike the co-ordinate system
+* think of it exactly as a multidimensional array with rows and columns in programming */
 
 package model;
 
@@ -176,7 +180,7 @@ public class Grid {
     }
 
     //EFFECTS: returns if the given position is empty or not
-    public boolean isEmpty(Position p) {
+    public boolean isCellEmpty(Position p) {
         int y = p.getPosY();
         int x = p.getPosX();
         int elementInt = grid[y][x];
