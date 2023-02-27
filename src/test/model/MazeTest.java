@@ -55,5 +55,36 @@ public class MazeTest {
         m3.placeEntity(1, 3, "m");
         assertEquals("e", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
         assertEquals("m", m3.getStatus(1, 3));
+
+        try{
+            assertEquals("p", m1.getStatus(0, 0));
+            m1.placeEntity(0, 0, "o");
+        } catch(ElementAlreadyExistsException e){
+            ;
+        }
+
+        assertEquals("e", m1.getStatus(1, 0));
+        m1.placeEntity(1, 0, "o");
+        assertEquals("o", m1.getStatus(1, 0));
+    }
+
+    @Test
+    public void getTest(){
+        assertEquals("MyFirstMaze", m1.getName());
+        int[] playerPos = m2.getPlayerPosition();
+        assertEquals(0, playerPos[0]);
+        assertEquals(0, playerPos[1]);
+
+        m2.movePlayer("r");
+        playerPos = m2.getPlayerPosition();
+        assertEquals(0, playerPos[0]);
+        assertEquals(1, playerPos[1]);
+
+
+        try{
+            String element = m3.getStatus(defaultGridSize,defaultGridSize);
+        } catch (OutOfBoundsException e){
+
+        }
     }
 }
