@@ -8,6 +8,8 @@
 
 package model;
 
+import model.exceptions.OutOfBoundsException;
+
 public class Grid {
     private final int upperX;
     private final int upperY;
@@ -161,7 +163,7 @@ public class Grid {
             default:
         }
 
-        if (newX >= 0 && newY >= 0 && newX < upperX && newY < upperY && grid[newY][newX] != 1) {
+        if (withinBounds(newY, newX) && grid[newY][newX] != 1) {
             grid[oldY][oldX] = 0;
             grid[newY][newX] = entity;
             return new Position(newY, newX);
@@ -180,10 +182,18 @@ public class Grid {
     }
 
     //EFFECTS: returns if the given position is empty or not
-    public boolean isCellEmpty(Position p) {
+    public boolean isCellEmpty(Position p) throws OutOfBoundsException {
         int y = p.getPosY();
         int x = p.getPosX();
+        if (!withinBounds(y, x)) {
+            throw new OutOfBoundsException();
+        }
         int elementInt = grid[y][x];
         return elementInt == 0;
+    }
+
+    //EFFECTS: returns if the given Position is within grid limits
+    private boolean withinBounds(int y, int x) {
+        return x >= 0 && y >= 0 && x < upperX && y < upperY;
     }
 }

@@ -53,7 +53,7 @@ public class Maze {
     //REQUIRES: y, and x should be in the grid limit
     //MODIFIES: this
     //EFFECTS: places an entity on the grid
-    public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException {
+    public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException, OutOfBoundsException {
         Position p = new Position(y, x);
         switch (entity) {
             case "p":

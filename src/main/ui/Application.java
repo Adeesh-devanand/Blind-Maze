@@ -197,6 +197,10 @@ public class Application {
                 System.out.println("Can't place object there");
                 System.out.println("Enter any key to try again");
                 input.next();
+            } catch (OutOfBoundsException e) {
+                System.out.println("Cursor is out of bounds");
+                System.out.println("Enter any key to try again");
+                input.next();
             }
             if (inp.equals("q")) {
                 flag = true;
