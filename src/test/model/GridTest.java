@@ -57,6 +57,10 @@ public class GridTest {
 
         new_p = new Position(2, 5);
 
+        assertEquals("p", grid2.getStatus(p4));
+        grid2.movePlayer("i");
+        assertEquals("p", grid2.getStatus(p4));
+
         assertEquals("e", grid2.getStatus(new_p));
         assertEquals("p", grid2.getStatus(p4));
         grid2.movePlayer("r");
@@ -71,6 +75,8 @@ public class GridTest {
         new_p = new Position(4, 5);
 
         assertEquals("e", grid2.getStatus(new_p));
+        grid2.movePlayer("d");
+        grid2.movePlayer("u");
         grid2.movePlayer("d");
         grid2.movePlayer("d");
         //Trying to move against obstacle
