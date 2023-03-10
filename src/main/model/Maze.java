@@ -1,16 +1,18 @@
 /*
-* A typical controller, handles all interaction between UI, and the model
-* the UI is only dependent on this class in the model package, all instructions
-* to the model are fed through this class */
+ * A typical controller, handles all interaction between UI, and the model
+ * the UI is only dependent on this class in the model package, all instructions
+ * to the model are fed through this class */
 
 package model;
 
+import model.exceptions.Contact;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
 
+import java.util.Objects;
+
 public class Maze {
     private final String name;
-    private final int gridSize;
     private final Grid grid;
 
     //EFFECTS: Creates a blank Maze with a given name
@@ -21,32 +23,25 @@ public class Maze {
     //EFFECTS: Creates a blank Maze with a given name and size
     public Maze(String name, int gridSize) {
         this.name = name;
-        this.gridSize = gridSize;
-        grid = new Grid(gridSize, gridSize);
+        grid = new Grid(gridSize);
     }
 
     //EFFECTS: Creates a deep copy of the given Maze
     public Maze(Maze oldMaze) {
         this.name = oldMaze.name; //you can access
         this.grid = new Grid(oldMaze.grid);//you can access
-        this.gridSize = oldMaze.getGridSize();
     }
 
     //MODIFIES: this
-    //EFFECTS: - moves player on the grid if it is a valid move,
+    //EFFECTS: - moves player on the grid if it is a valid setPosition,
     //         - returns whether the player made contact with the monster
     public boolean movePlayer(String dir) {
-        grid.movePlayer(dir);
-
-        Position monsterP = grid.getMonsterPos();
-        int monsterY = monsterP.getPosX();
-        int monsterX = monsterP.getPosX();
-
-        Position playerP = grid.getPlayerPos();
-        int playerY = playerP.getPosY();
-        int playerX = playerP.getPosX();
-
-        return monsterY == playerY && monsterX == playerX;
+        try {
+            grid.movePlayer(dir);
+        } catch (Contact e) {
+            return true;
+        }
+        return false;
     }
 
     //TODO: Need to add OutOfBoundsException similar to getStatus() method
@@ -54,23 +49,16 @@ public class Maze {
     //MODIFIES: this
     //EFFECTS: places an entity on the grid
     public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException, OutOfBoundsException {
-        Position p = new Position(y, x);
+        Position p = new Position(x, y);
         switch (entity) {
-            case "p":
-            case "o":
-            case "m":
-                if (!grid.isCellEmpty(p)) {
-                    throw new ElementAlreadyExistsException();
-                }
-                if (entity.equals("o")) {
-                    grid.placeObstacle(p);
-                } else if (entity.equals("m")) {
-                    grid.clearCell(grid.getMonsterPos());
-                    grid.placeMonster(p);
-                } else {
-                    grid.clearCell(grid.getPlayerPos());
-                    grid.placePlayer(p);
-                }
+            case "Player":
+                grid.setPlayerPosition(p);
+                break;
+            case "Obstacle":
+                grid.placeObstacle(p);
+                break;
+            case "Monster":
+                grid.setMonsterPosition(p);
                 break;
             default:
                 break;
@@ -84,7 +72,7 @@ public class Maze {
 
     //EFFECTS: returns gridSize
     public int getGridSize() {
-        return gridSize;
+        return grid.getSize();
     }
 
     //EFFECTS: returns the position of the player
@@ -96,10 +84,23 @@ public class Maze {
     //EFFECTS: returns the entity at the position
     //         - [e, o, p, m] for empty, object, player, and monster
     public String getStatus(int y, int x) throws OutOfBoundsException {
-        if (x < 0 || y < 0 || x >= gridSize || y >= gridSize) {
-            throw new OutOfBoundsException();
+        return grid.getStatus(new Position(x, y));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
         }
-        Position p = new Position(y, x);
-        return grid.getStatus(p);
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Maze maze = (Maze) o;
+        return name.equals(maze.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name);
     }
 }

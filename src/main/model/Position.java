@@ -6,20 +6,35 @@
 
 package model;
 
-public class Position {
-    private final int posY;
-    private final int posX;
+import java.util.Objects;
 
-    public Position(int y, int x) {
-        posY = y;
+public class Position {
+    private final int posX;
+    private final int posY;
+
+    public Position(int x, int y) {
         posX = x;
+        posY = y;
+    }
+
+    public int getPosX() {
+        return posX;
     }
 
     public int getPosY() {
         return posY;
     }
 
-    public int getPosX() {
-        return posX;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Position position = (Position) o;
+        return posY == position.posY && posX == position.posX;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(posY, posX);
     }
 }

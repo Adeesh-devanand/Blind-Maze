@@ -15,60 +15,76 @@ public class MazeTest {
     private final int defaultGridSize = 10;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         m1 = new Maze("MyFirstMaze");
         m2 = new Maze("SmallerMaze", 3);
         m3 = new Maze(m1);//copy of maze1
     }
 
     @Test
-    public void movePlayerTest() throws OutOfBoundsException {
-        assertEquals("p", m2.getStatus(0, 0));
-        assertEquals("e", m2.getStatus(1, 0));
-        assertEquals("e", m2.getStatus(1, 1));
-        assertEquals("e", m2.getStatus(1, 2));
+    public void copyTest() {
+        try {
+            assertEquals("Monster", m3.getStatus(defaultGridSize - 1, defaultGridSize - 1));
+            assertEquals("Empty", m3.getStatus(1, 3));
+            m3.placeEntity(1, 3, "Monster");
+            assertEquals("Empty", m3.getStatus(defaultGridSize - 1, defaultGridSize - 1));
+            assertEquals("Monster", m3.getStatus(1, 3));
 
-        assertFalse(m2.movePlayer("d"));
-        assertFalse(m2.movePlayer("r"));
-        assertFalse(m2.movePlayer("r"));
-        assertEquals("e", m2.getStatus(0, 0));
-        assertEquals("e", m2.getStatus(1, 0));
-        assertEquals("e", m2.getStatus(1, 1));
-        assertEquals("p", m2.getStatus(1, 2));
-
-
-        assertEquals("m", m2.getStatus(2, 2));
-        boolean result = m2.movePlayer("d");
-        assertTrue(result);
+            assertEquals("Empty", m3.getStatus(defaultGridSize - 1, defaultGridSize - 1));
+            m3.placeEntity(1, 3, "q");
+            assertEquals("Empty", m3.getStatus(defaultGridSize - 1, defaultGridSize - 1));
+        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+            fail();
+        }
     }
 
     @Test
-    public void placeEntityTest() throws OutOfBoundsException, ElementAlreadyExistsException {
-        assertEquals("p", m2.getStatus(0, 0));
-        assertEquals("e", m2.getStatus(1, 0));
-        m2.placeEntity(1, 0, "p");
-        assertEquals("e", m2.getStatus(0, 0));
-        assertEquals("p", m2.getStatus(1, 0));
+    public void movePlayerTest() {
+        try {
+            assertEquals("Player", m2.getStatus(0, 0));
+            assertEquals("Empty", m2.getStatus(1, 0));
+            assertEquals("Empty", m2.getStatus(1, 1));
+            assertEquals("Empty", m2.getStatus(1, 2));
 
-        assertEquals("m", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
-        assertEquals("e", m3.getStatus(1, 3));
-        m3.placeEntity(1, 3, "m");
-        assertEquals("e", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
-        assertEquals("m", m3.getStatus(1, 3));
+            assertFalse(m2.movePlayer("d"));
+            assertFalse(m2.movePlayer("r"));
+            assertFalse(m2.movePlayer("r"));
+            assertEquals("Empty", m2.getStatus(0, 0));
+            assertEquals("Empty", m2.getStatus(1, 0));
+            assertEquals("Empty", m2.getStatus(1, 1));
+            assertEquals("Player", m2.getStatus(1, 2));
 
-        assertEquals("e", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
-        m3.placeEntity(1, 3, "q");
-        assertEquals("e", m3.getStatus(defaultGridSize-1, defaultGridSize-1));
 
-        assertThrows(ElementAlreadyExistsException.class, () -> m1.placeEntity(0, 0, "o"));
-
-        assertEquals("e", m1.getStatus(1, 0));
-        m1.placeEntity(1, 0, "o");
-        assertEquals("o", m1.getStatus(1, 0));
+            assertEquals("Monster", m2.getStatus(2, 2));
+            boolean result = m2.movePlayer("d");
+            assertTrue(result);
+        } catch (OutOfBoundsException e) {
+            fail();
+        }
     }
 
     @Test
-    public void getTest(){
+    public void placeEntityTest() {
+        try {
+            assertEquals("Player", m2.getStatus(0, 0));
+            assertEquals("Empty", m2.getStatus(1, 0));
+            m2.placeEntity(1, 0, "Player");
+            assertEquals("Empty", m2.getStatus(0, 0));
+            assertEquals("Player", m2.getStatus(1, 0));
+
+            assertThrows(ElementAlreadyExistsException.class, () -> m1.placeEntity(0, 0, "Obstacle"));
+
+            assertEquals("Empty", m1.getStatus(1, 0));
+            m1.placeEntity(1, 0, "Obstacle");
+            assertEquals("Obstacle", m1.getStatus(1, 0));
+
+        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+            fail();
+        }
+    }
+
+    @Test
+    public void getTest() {
         assertEquals("MyFirstMaze", m1.getName());
         int[] playerPos = m2.getPlayerPosition();
         assertEquals(0, playerPos[0]);
@@ -79,6 +95,6 @@ public class MazeTest {
         assertEquals(0, playerPos[0]);
         assertEquals(1, playerPos[1]);
 
-        assertThrows(OutOfBoundsException.class, () -> m3.getStatus(defaultGridSize,defaultGridSize));
+        assertThrows(OutOfBoundsException.class, () -> m3.getStatus(defaultGridSize, defaultGridSize));
     }
 }
