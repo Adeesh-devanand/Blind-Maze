@@ -23,8 +23,6 @@ public class Grid {
     private Monster monster;
     private Cursor cursor;
 
-    private static final Element empty = new Empty();
-
 
     //EFFECTS: Creates an Empty Grid of size (x across by y down)
     public Grid(int gridSize) {
@@ -35,7 +33,7 @@ public class Grid {
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
                 temp = new Position(j, i);
-                grid.put(temp, empty);
+                grid.put(temp, new Empty());
             }
         }
 
@@ -52,24 +50,28 @@ public class Grid {
         this.gridSize = oldGrid.gridSize; //you can access
         this.grid = new HashMap<>();
 
-        Position temp;
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
-                temp = new Position(j, i);
-                grid.put(temp, empty);
-            }
-        }
-
         for (Map.Entry<Position, Element> entry : oldGrid.grid.entrySet()) {
             Position key = entry.getKey();
             Element value = entry.getValue();
-            value = new Element(value);
-            this.grid.put(key, value);
+
+            switch (value.getType()) {
+                case "Empty":
+                    this.grid.put(key, new Empty());
+                    break;
+                case "Obstacle":
+                    this.grid.put(key, new Obstacle());
+                    break;
+                default:
+            }
         }
 
         this.player = new Player(oldGrid.player);
         this.monster = new Monster(oldGrid.monster);
         this.cursor = new Cursor(oldGrid.cursor);
+
+        grid.put(this.player.getPosition(), this.player);
+        grid.put(this.monster.getPosition(), this.monster);
+        grid.put(this.cursor.getPosition(), this.cursor);
     }
 
     //REQUIRES: Position p should be empty, and be within grid limits
@@ -213,7 +215,7 @@ public class Grid {
     //MODIFIES: this
     //EFFECTS: Clears the Position on the grid
     private void clearCell(Position position) {
-        grid.replace(position, empty);
+        grid.replace(position, new Empty());
     }
 
     //EFFECTS: returns if the given position is empty or not
