@@ -5,7 +5,8 @@
 
 package model;
 
-import model.exceptions.Contact;
+import model.grid.Grid;
+import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
 public class Maze {
     private final String name;
     private final Grid grid;
+    private boolean gameMode;
 
     //EFFECTS: Creates a blank Maze with a given name
     public Maze(String name) {
@@ -38,13 +40,17 @@ public class Maze {
     public boolean movePlayer(String dir) {
         try {
             grid.movePlayer(dir);
-        } catch (Contact e) {
+        } catch (ContactException e) {
             return true;
         }
         return false;
     }
 
-    //TODO: Need to add OutOfBoundsException similar to getStatus() method
+    public boolean moveCursor(String dir) {
+        grid.moveCursor(dir);
+        return true;
+    }
+
     //REQUIRES: y, and x should be in the grid limit
     //MODIFIES: this
     //EFFECTS: places an entity on the grid
@@ -82,7 +88,7 @@ public class Maze {
     }
 
     //EFFECTS: returns the entity at the position
-    //         - [e, o, p, m] for empty, object, player, and monster
+    //         empty, object, player, or monster
     public String getStatus(int y, int x) throws OutOfBoundsException {
         return grid.getStatus(new Position(x, y));
     }

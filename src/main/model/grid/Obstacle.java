@@ -1,7 +1,4 @@
-package model.elements;
-
-import model.Grid;
-import model.Position;
+package model.grid;
 
 public class Obstacle extends StationaryElement {
 

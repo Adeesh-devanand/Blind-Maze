@@ -1,6 +1,4 @@
-package model.elements;
-
-import model.Position;
+package model.grid;
 
 public class Empty extends StationaryElement {
 

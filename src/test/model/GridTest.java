@@ -1,6 +1,7 @@
 package model;
 
-import model.exceptions.Contact;
+import model.grid.Grid;
+import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -96,12 +97,12 @@ public class GridTest {
 
             try {
                 grid1.moveMonster("d");
-            } catch (Contact e) {
+            } catch (ContactException e) {
                 fail();
             }
             assertEquals("Monster", grid1.getStatus(p7_6));
             assertEquals("Obstacle", grid1.getStatus(p7_7));
-        } catch (OutOfBoundsException | ElementAlreadyExistsException | Contact e) {
+        } catch (OutOfBoundsException | ElementAlreadyExistsException | ContactException e) {
             fail();
         }
     }

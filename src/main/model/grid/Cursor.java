@@ -1,6 +1,5 @@
-package model.elements;
+package model.grid;
 
-import model.Grid;
 import model.Position;
 
 public class Cursor extends Element {

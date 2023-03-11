@@ -8,8 +8,10 @@
 
 package ui;
 
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args) {
-        new Application();
+    public static void main(String[] args) throws Exception {
+        new ConsoleInterface();
     }
 }

@@ -1,4 +1,4 @@
-package model.elements;
+package model.grid;
 
 import model.Position;
 

@@ -5,10 +5,10 @@
 * NOTE: All positions start from the top left corner i.e top left is (0, 0)
 * 'y' represents the y axes, and 'x' represents the x axes */
 
-package model;
+package model.grid;
 
-import model.elements.*;
-import model.exceptions.Contact;
+import model.Position;
+import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
 
@@ -129,10 +129,10 @@ public class Grid {
     //TODO: resolve conflict when monster and player collide
     //MODIFIES: this
     //EFFECTS: Moves Player on Grid if it is a valid setPosition, else doesn't do anything
-    public void movePlayer(String dir) throws Contact {
+    public void movePlayer(String dir) throws ContactException {
         Position newPos = getNextPos(player, dir);
         if (newPos.equals(getMonsterPos())) {
-            throw new Contact();
+            throw new ContactException();
         }
         try {
             setPlayerPosition(newPos);
@@ -143,10 +143,10 @@ public class Grid {
 
     //MODIFIES: this
     //EFFECTS: Moves Player on Grid if it is a valid setPosition, else doesn't do anything
-    public void moveMonster(String dir) throws Contact {
+    public void moveMonster(String dir) throws ContactException {
         Position newPos = getNextPos(monster, dir);
         if (newPos.equals(getPlayerPos())) {
-            throw new Contact();
+            throw new ContactException();
         }
         try {
             setMonsterPosition(newPos);
@@ -195,7 +195,6 @@ public class Grid {
                 break;
             case "d":
                 newY++;
-            default:
         }
         return new Position(newX, newY);
     }
