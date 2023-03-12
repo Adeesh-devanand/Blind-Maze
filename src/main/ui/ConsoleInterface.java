@@ -8,36 +8,34 @@
 
 package ui;
 
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
-
-import java.io.IOException;
+import java.util.Scanner;
 
 public class ConsoleInterface {
-    private Screen screen;
+    private Scanner scn;
     private Controller controller;
-    private WindowBasedTextGUI textGUI;
 
-    //EFFECTS: initializes the ConsoleInterface and runs the Menu till the user quits
-    public ConsoleInterface() throws IOException {
+    //EFFECTS: initializes the ConsoleInterface and runs the ConsoleOutput till the user quits
+    public ConsoleInterface() {
         initialize();
         run();
     }
 
-    private void initialize() throws IOException {
-        screen = new DefaultTerminalFactory().createScreen();
-        screen.startScreen();
-        controller = new Controller(screen);
+    private void initialize() {
+        scn = new Scanner(System.in);
+        scn.useDelimiter("\n");
+        controller = new Controller();
     }
 
-    private void run() throws IOException {
+    private void run() {
         while (controller.isGameRunning()) {
-            KeyStroke inp = screen.readInput();
-            controller.updateGame(inp);
             controller.updateScreen();
+            String inp = readInput();
+            controller.updateApplication(inp);
         }
+    }
+
+    private String readInput() {
+        return scn.next();
     }
 
 }

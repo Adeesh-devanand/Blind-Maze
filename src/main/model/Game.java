@@ -1,6 +1,7 @@
 package model;
 
 import model.exceptions.MazeAlreadyExistsException;
+import model.exceptions.MazeDoesNotExistExcption;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,19 +23,26 @@ public class Game {
         mazeList = new HashMap();
     }
 
-    public boolean isGameRunning() {
+    public boolean getGameRunner() {
         return gameRunning;
+    }
+
+    public void setGameRunning(boolean gameRunning) {
+        this.gameRunning = gameRunning;
     }
 
     public void toggleMode() {
         editMode = !editMode;
     }
 
-    public void updateMaze(String key) {
-        editMode ? currMaze.moveCursor(key) : currMaze.movePlayer(dir);
+    public String getMode(){
+        return editMode ? "EditMode" : "PlayMode";
     }
 
-    private void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
+    public void updateMaze(String key) {
+    }
+
+    public void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
         if (mazeList.get(name) != null) {
             throw new MazeAlreadyExistsException();
         } else {
@@ -42,11 +50,14 @@ public class Game {
         }
     }
 
-    private void selectMaze(String name) {
-        currMaze = mazeList.get(name);
+    public void selectMaze(String name) throws MazeDoesNotExistExcption {
+        Maze tempMaze = mazeList.get(name);
+        if (tempMaze == null) {
+            throw new MazeDoesNotExistExcption();
+        }
     }
 
-    private void deleteMaze(String name) {
+    public void deleteMaze(String name) {
         mazeList.remove(name);
     }
 

@@ -1,64 +1,86 @@
 package ui;
 
-import com.googlecode.lanterna.TerminalPosition;
-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
-import com.googlecode.lanterna.input.KeyStroke;
-import com.googlecode.lanterna.screen.Screen;
 import model.Game;
+import model.exceptions.MazeAlreadyExistsException;
+import model.exceptions.MazeDoesNotExistExcption;
 
-import java.io.IOException;
+import java.util.Scanner;
 
 public class Controller {
     private Game game;
-    private Screen screen;
+    private ConsoleOutput consoleOutput;
     private boolean inMenu;
-    private WindowBasedTextGUI textGUI;
+    private Scanner scn;
 
-    public Controller(Screen screen) {
+    public Controller() {
         inMenu = true;
         game = new Game();
-        this.screen = screen;
+        consoleOutput = new ConsoleOutput(game);
+        scn = new Scanner(System.in);
     }
 
     public boolean isGameRunning() {
-        return game.isGameRunning();
+        return game.getGameRunner();
     }
 
-    public void updateGame(KeyStroke stroke) {
-        if (stroke == null) {
-            return;
-        }
-
-        String ch = stroke.getCharacter().toString().toLowerCase();
-        switch (ch) {
-            case "c":
-            case "o":
-            case "q":
-            case "t":
-                break;
-            default:
-                game.updateMaze(ch);
-        }
-    }
-
-    public void updateScreen() throws IOException {
-        screen.setCursorPosition(new TerminalPosition(0, 0));
-        screen.clear();
-        render();
-        screen.refresh();
-    }
-
-    private void render() {
+    public void updateApplication(String inp) {
         if (inMenu) {
-            drawMenu();
+            switch (inp) {
+                case "c":
+                    consoleOutput.setPage(ConsoleOutput.Page.CREATE);
+                    createMaze();
+                    break;
+                case "o":
+                    consoleOutput.setPage(ConsoleOutput.Page.OPEN);
+                    openMaze();
+                    inMenu = false;
+                    break;
+                case "t":
+                    consoleOutput.setPage(ConsoleOutput.Page.TOGGLE);
+                    toggleMode();
+                    break;
+                case "q":
+                    System.exit(0);
+            }
         } else {
-            drawMaze();
+            updateGame();
         }
     }
 
-    private void drawMenu() {
+    private void updateGame() {
     }
 
-    private void drawMaze() {
+    private void toggleMode() {
+        updateScreen();
+        game.toggleMode();
+        consoleOutput.setPage(ConsoleOutput.Page.MAIN);
+    }
+
+    private void openMaze() {
+        try {
+            updateScreen();
+            String name = scn.next();
+            game.selectMaze(name);
+            consoleOutput.setPage(ConsoleOutput.Page.GAME);
+        } catch (MazeDoesNotExistExcption e) {
+            System.out.println("Maze doesn't exist");
+            openMaze();
+        }
+    }
+
+    private void createMaze() {
+        try {
+            updateScreen();
+            String name = scn.next();
+            game.createMaze(name, 5);
+            consoleOutput.setPage(ConsoleOutput.Page.MAIN);
+        } catch (MazeAlreadyExistsException e) {
+            System.out.println("Maze already exists");
+            createMaze();
+        }
+    }
+
+    public void updateScreen() {
+        consoleOutput.drawApplication();
     }
 }
