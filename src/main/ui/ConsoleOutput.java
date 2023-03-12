@@ -30,7 +30,7 @@ public class ConsoleOutput {
             case TOGGLE:
                 drawToggleScreen();
             case OPEN:
-                drawOpenMaze();
+                drawOpenScreen();
                 break;
             case GAME:
                 drawGame();
@@ -38,6 +38,7 @@ public class ConsoleOutput {
     }
 
     private void drawGame() {
+
     }
 
     private void drawCreateScreen() {
@@ -45,10 +46,14 @@ public class ConsoleOutput {
     }
 
     private void drawMainMenu() {
-        System.out.println("Main Menu");
+        System.out.println("\nSelect from:");
+        System.out.println("\to -> open maze");
+        System.out.println("\tc -> create new maze");
+        System.out.println("\tt -> toggle mode");
+        System.out.println("\tq -> quit");
     }
 
-    private void drawOpenMaze() {
+    private void drawOpenScreen() {
         System.out.println("Enter the maze you want to open");
     }
     

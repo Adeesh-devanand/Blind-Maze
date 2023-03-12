@@ -1,5 +1,6 @@
 package model;
 
+import model.exceptions.EmptyListException;
 import model.exceptions.MazeAlreadyExistsException;
 import model.exceptions.MazeDoesNotExistExcption;
 
@@ -27,15 +28,11 @@ public class Game {
         return gameRunning;
     }
 
-    public void setGameRunning(boolean gameRunning) {
-        this.gameRunning = gameRunning;
-    }
-
     public void toggleMode() {
         editMode = !editMode;
     }
 
-    public String getMode(){
+    public String getMode()     {
         return editMode ? "EditMode" : "PlayMode";
     }
 
@@ -50,8 +47,12 @@ public class Game {
         }
     }
 
-    public void selectMaze(String name) throws MazeDoesNotExistExcption {
+    public void selectMaze(String name) throws MazeDoesNotExistExcption, EmptyListException {
         Maze tempMaze = mazeList.get(name);
+
+        if (mazeList.isEmpty()) {
+            throw new EmptyListException();
+        }
         if (tempMaze == null) {
             throw new MazeDoesNotExistExcption();
         }
