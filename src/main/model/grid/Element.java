@@ -1,6 +1,8 @@
 package model.grid;
 
 import model.Position;
+import org.json.JSONObject;
+import persistence.Writable;
 
 public abstract class Element {
     private Position position;
@@ -22,19 +24,20 @@ public abstract class Element {
         this.position = position;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
-    }
-
-    public String getIcon() {
+    protected String getIcon() {
         return icon;
     }
 
-    public String getType() {
+    protected String getType() {
         return type;
     }
 
-    public Position getPosition() {
+    protected Position getPosition() {
         return position;
+    }
+
+    @Override
+    public String toString() {
+        return type;
     }
 }

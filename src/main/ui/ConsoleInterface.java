@@ -27,7 +27,7 @@ public class ConsoleInterface {
     }
 
     private void run() {
-        while (controller.isGameRunning()) {
+        while (true) {
             controller.updateScreen();
             String inp = readInput();
             controller.updateApplication(inp);

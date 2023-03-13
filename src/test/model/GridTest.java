@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GridTest {
-    Grid grid1;
+    Grid grid;
 
     Position p0_0;
     Position p0_1;
@@ -22,7 +22,7 @@ public class GridTest {
 
     @BeforeEach
     public void setup() {
-        grid1 = new Grid(8);
+        grid = new Grid(8);
 
         p0_0 = new Position(0, 0);
         p0_1 = new Position(0, 1);
@@ -36,28 +36,28 @@ public class GridTest {
     @Test
     public void placeTest() {
         try {
-            assertEquals("Empty", grid1.getStatus(p0_1));
-            assertEquals("Player", grid1.getStatus(p0_0));
-            assertEquals("Empty", grid1.getStatus(p4_5));
+            assertEquals("Empty", grid.getStatus(p0_1));
+            assertEquals("Player", grid.getStatus(p0_0));
+            assertEquals("Empty", grid.getStatus(p4_5));
 
-            grid1.placeObstacle(p0_1);
-            grid1.setPlayerPosition(p4_5);
+            grid.placeObstacle(p0_1);
+            grid.setPlayerPosition(p4_5);
 
-            assertEquals("Obstacle", grid1.getStatus(p0_1));
-            assertEquals("Empty", grid1.getStatus(p0_0));
-            assertEquals("Player", grid1.getStatus(p4_5));
-            assertEquals("Monster", grid1.getStatus(p7_7));
+            assertEquals("Obstacle", grid.getStatus(p0_1));
+            assertEquals("Empty", grid.getStatus(p0_0));
+            assertEquals("Player", grid.getStatus(p4_5));
+            assertEquals("Monster", grid.getStatus(p7_7));
 
-            assertEquals("Monster", grid1.getStatus(p7_7));
-            assertEquals("Empty", grid1.getStatus(p0_0));
-            grid1.setMonsterPosition(p0_0);
-            assertEquals("Monster", grid1.getStatus(p0_0));
-            assertEquals("Empty", grid1.getStatus(p7_7));
+            assertEquals("Monster", grid.getStatus(p7_7));
+            assertEquals("Empty", grid.getStatus(p0_0));
+            grid.setMonsterPosition(p0_0);
+            assertEquals("Monster", grid.getStatus(p0_0));
+            assertEquals("Empty", grid.getStatus(p7_7));
         } catch (Exception e) {
             fail();
         }
 
-        assertThrows(ElementAlreadyExistsException.class, () -> grid1.placeObstacle(p0_0));
+        assertThrows(ElementAlreadyExistsException.class, () -> grid.placeObstacle(p0_0));
     }
 
     @Test
@@ -68,42 +68,48 @@ public class GridTest {
             Position p7_6 = new Position(7, 6);
             Position p5_7 = new Position(5, 7);
 
-            grid1.setMonsterPosition(p3_1);
-            grid1.setMonsterPosition(p7_7);
-            assertEquals("Empty", grid1.getStatus(p7_6));
-            assertEquals("Monster", grid1.getStatus(p7_7));
-            grid1.moveMonster("u");
-            assertEquals("Monster", grid1.getStatus(p7_6));
-            assertEquals("Empty", grid1.getStatus(p7_7));
+            grid.setMonsterPosition(p3_1);
+            grid.setMonsterPosition(p7_7);
+            assertEquals("Empty", grid.getStatus(p7_6));
+            assertEquals("Monster", grid.getStatus(p7_7));
+            grid.moveMonster("u");
+            assertEquals("Monster", grid.getStatus(p7_6));
+            assertEquals("Empty", grid.getStatus(p7_7));
 
-            assertEquals("Player", grid1.getStatus(p4_5));
-            assertEquals("Empty", grid1.getStatus(p5_5));
-            grid1.movePlayer("d");
-            assertEquals("Empty", grid1.getStatus(p4_5));
-            assertEquals("Player", grid1.getStatus(p5_5));
+            assertEquals("Player", grid.getStatus(p4_5));
+            assertEquals("Empty", grid.getStatus(p5_5));
+            grid.movePlayer("d");
+            assertEquals("Empty", grid.getStatus(p4_5));
+            assertEquals("Player", grid.getStatus(p5_5));
 
-            grid1.movePlayer("d");
-            grid1.movePlayer("d");
+            grid.movePlayer("d");
+            grid.movePlayer("d");
 
 
             //Trying to move against edge
-            assertEquals("Player", grid1.getStatus(p5_7));
-            grid1.movePlayer("d");
-            assertEquals("Player", grid1.getStatus(p5_7));
+            assertEquals("Player", grid.getStatus(p5_7));
+            grid.movePlayer("d");
+            assertEquals("Player", grid.getStatus(p5_7));
 
-            grid1.placeObstacle(p7_7);
-            assertEquals("Obstacle", grid1.getStatus(p7_7));
-            assertEquals("Monster", grid1.getStatus(p7_6));
+            grid.placeObstacle(p7_7);
+            assertEquals("Obstacle", grid.getStatus(p7_7));
+            assertEquals("Monster", grid.getStatus(p7_6));
 
             try {
-                grid1.moveMonster("d");
+                grid.moveMonster("d");
             } catch (ContactException e) {
                 fail();
             }
-            assertEquals("Monster", grid1.getStatus(p7_6));
-            assertEquals("Obstacle", grid1.getStatus(p7_7));
+            assertEquals("Monster", grid.getStatus(p7_6));
+            assertEquals("Obstacle", grid.getStatus(p7_7));
         } catch (OutOfBoundsException | ElementAlreadyExistsException | ContactException e) {
             fail();
         }
+    }
+
+    @Test
+    public void jsonTest(){
+        Grid grid1 = new Grid(3);
+        grid1.toJson();
     }
 }

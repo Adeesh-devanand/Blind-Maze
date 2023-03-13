@@ -1,34 +1,35 @@
 package ui;
 
 import model.Game;
-import model.exceptions.EmptyListException;
 import model.exceptions.MazeAlreadyExistsException;
 import model.exceptions.MazeDoesNotExistExcption;
-import org.json.JSONObject;
+import persistence.JsonReader;
+import persistence.JsonWriter;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Scanner;
 
 public class Controller {
+    private static final String JSON_STORE = "./data/workroom.json";
     private Game game;
     private ConsoleOutput consoleOutput;
     private Scanner scn;
-    private boolean inMenu;
+    private JsonReader reader;
+    private JsonWriter writer;
 
     public Controller() {
-        inMenu = true;
         game = new Game();
         consoleOutput = new ConsoleOutput(game);
         scn = new Scanner(System.in);
-    }
-
-    public boolean isGameRunning() {
-        return game.getGameRunner();
+        reader = new JsonReader(JSON_STORE);
+        writer = new JsonWriter(JSON_STORE);
     }
 
     public void updateApplication(String inp) {
         if (inp.equals("e")) {
             exitApplication();
-        } else if (inMenu) {
+        } else if (!game.isRunning()) {
             switch (inp) {
                 case "c":
                     consoleOutput.setPage(ConsoleOutput.Page.CREATE);
@@ -37,16 +38,33 @@ public class Controller {
                 case "o":
                     consoleOutput.setPage(ConsoleOutput.Page.OPEN);
                     openMaze();
-                    inMenu = false;
                     break;
                 case "t":
                     consoleOutput.setPage(ConsoleOutput.Page.TOGGLE);
                     toggleMode();
                     break;
+                case "l":
+                    loadSession();
+                    break;
+//                case "s":
+//                    save();
             }
         } else {
             updateGame(inp);
         }
+    }
+
+    private void loadSession() {
+        try {
+            game = reader.loadGame();
+            System.out.println("Loaded Previous Session from " + JSON_STORE);
+            if (game.isRunning()) {
+                consoleOutput.setPage(ConsoleOutput.Page.GAME);
+            }
+        } catch (IOException e) {
+            System.out.println("Unable to read from file: " + JSON_STORE);
+        }
+
     }
 
     private void exitApplication() {
@@ -71,14 +89,18 @@ public class Controller {
     }
 
     private void openMaze() {
+        if (game.isEmpty()) {
+            System.out.println("Create a maze first");
+            consoleOutput.setPage(ConsoleOutput.Page.MAIN);
+            return;
+        }
+
         try {
             updateScreen();
             String name = scn.next();
             game.selectMaze(name);
             consoleOutput.setPage(ConsoleOutput.Page.GAME);
-        } catch (EmptyListException e) {
-            System.out.println("Create a maze first");
-            updateApplication("c");
+            game.setRunning(true);
         } catch (MazeDoesNotExistExcption e) {
             System.out.println("Maze doesn't exist");
             openMaze();
@@ -102,6 +124,13 @@ public class Controller {
     }
 
     public void save() {
-        JSONObject json = new JSONObject();
+        try {
+            writer.open();
+            writer.writeGame(game);
+            writer.close();
+            System.out.println("Saved game to " + JSON_STORE);
+        } catch (FileNotFoundException e) {
+            System.out.println("Unable to write to file: " + JSON_STORE);
+        }
     }
 }

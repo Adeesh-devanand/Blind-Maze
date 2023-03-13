@@ -9,13 +9,14 @@ import model.grid.Grid;
 import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
+import org.json.JSONObject;
+import persistence.Writable;
 
 import java.util.Objects;
 
-public class Maze {
+public class Maze implements Writable {
     private final String name;
     private final Grid grid;
-    private boolean gameMode;
 
     //EFFECTS: Creates a blank Maze with a given name
     public Maze(String name) {
@@ -54,8 +55,8 @@ public class Maze {
     //REQUIRES: y, and x should be in the grid limit
     //MODIFIES: this
     //EFFECTS: places an entity on the grid
-    public void placeEntity(int y, int x, String entity) throws ElementAlreadyExistsException, OutOfBoundsException {
-        Position p = new Position(x, y);
+    public void placeEntity(String entity) throws ElementAlreadyExistsException, OutOfBoundsException {
+        Position p = grid.getCursorPos();
         switch (entity) {
             case "Player":
                 grid.setPlayerPosition(p);
@@ -82,14 +83,13 @@ public class Maze {
     }
 
     //EFFECTS: returns the position of the player
-    public int[] getPlayerPosition() {
-        Position p = grid.getPlayerPos();
-        return new int[]{p.getPosY(), p.getPosX()};
+    public Position getPlayerPosition() {
+        return grid.getPlayerPos();
     }
 
     //EFFECTS: returns the entity at the position
     //         empty, object, player, or monster
-    public String getStatus(int y, int x) throws OutOfBoundsException {
+    public String getStatus(int x, int y) throws OutOfBoundsException {
         return grid.getStatus(new Position(x, y));
     }
 
@@ -109,4 +109,14 @@ public class Maze {
     public int hashCode() {
         return Objects.hash(name);
     }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("name", name);
+        json.put("grid", grid.toJson());
+        return json;
+    }
+
+
 }

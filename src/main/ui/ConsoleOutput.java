@@ -4,14 +4,15 @@ import model.Game;
 
 public class ConsoleOutput {
     private Page page;
-    private Game game;
+    private final Game game;
 
     public enum Page {
-        MAIN,
         CREATE,
+        GAME,
+        MAIN,
         OPEN,
-        TOGGLE,
-        GAME;
+        TOGGLE
+
     }
 
     public ConsoleOutput(Game game) {
@@ -20,6 +21,9 @@ public class ConsoleOutput {
     }
 
     public void drawApplication() {
+        if (game.isRunning()) {
+            page = Page.MAIN;
+        }
         switch (page) {
             case MAIN:
                 drawMainMenu();
@@ -29,6 +33,7 @@ public class ConsoleOutput {
                 break;
             case TOGGLE:
                 drawToggleScreen();
+                break;
             case OPEN:
                 drawOpenScreen();
                 break;
@@ -38,7 +43,13 @@ public class ConsoleOutput {
     }
 
     private void drawGame() {
-
+        String[][] gridToBeDisplayed =  game.getGrid();
+        for (String[] row : gridToBeDisplayed) {
+            for (String column : row) {
+                System.out.print(column + " ");
+            }
+            System.out.println();
+        }
     }
 
     private void drawCreateScreen() {
@@ -50,7 +61,7 @@ public class ConsoleOutput {
         System.out.println("\to -> open maze");
         System.out.println("\tc -> create new maze");
         System.out.println("\tt -> toggle mode");
-        System.out.println("\tq -> quit");
+        System.out.println("\te -> exit");
     }
 
     private void drawOpenScreen() {

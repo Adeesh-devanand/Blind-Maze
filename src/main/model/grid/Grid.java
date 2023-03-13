@@ -11,11 +11,15 @@ import model.Position;
 import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import persistence.Writable;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
-public class Grid {
+public class Grid implements Writable {
     private final int gridSize;
     private final Map<Position, Element> grid;
 
@@ -225,12 +229,26 @@ public class Grid {
 
     //EFFECTS: returns if the given Position is within grid limits
     private boolean isWithinBounds(Position position) {
-        int x = position.getPosY();
+        int x = position.getPosX();
         int y = position.getPosY();
         return x >= 0 && y >= 0 && x < gridSize && y < gridSize;
     }
 
     public int getSize() {
         return gridSize;
+    }
+
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        json.put("gridSize", gridSize);
+        json.put("cursorPos", getCursorPos().toString());
+
+        Iterator<Map.Entry<Position, Element>> it = grid.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Position, Element> pairs = it.next();
+            json.put(pairs.getKey().toString(), pairs.getValue().toString());
+        }
+        return json;
     }
 }

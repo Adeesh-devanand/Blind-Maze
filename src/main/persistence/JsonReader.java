@@ -29,4 +29,20 @@ public class JsonReader {
 
         return contentBuilder.toString();
     }
+
+    public Game loadGame() throws IOException {
+        String jsonData = readFile(source);
+        JSONObject jsonObject = new JSONObject(jsonData);
+        return parseGame(jsonObject);
+    }
+
+    private Game parseGame(JSONObject jsonObject) {
+        JSONObject currMaze = jsonObject.getJSONObject("currMaze");
+        JSONArray mazeList = jsonObject.getJSONArray("mazeList");
+        boolean gameRunning = jsonObject.getBoolean("gameRunning");
+        boolean editMode = jsonObject.getBoolean("editMode");
+        int playerVisibility = jsonObject.getInt("playerVisibility");
+        Game game = new Game(currMaze, mazeList, gameRunning, editMode, playerVisibility);
+        return null;
+    }
 }

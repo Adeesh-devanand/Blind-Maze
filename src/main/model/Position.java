@@ -6,9 +6,12 @@
 
 package model;
 
+import org.json.JSONObject;
+import persistence.Writable;
+
 import java.util.Objects;
 
-public class Position {
+public class Position implements Writable {
     private final int posX;
     private final int posY;
 
@@ -27,8 +30,12 @@ public class Position {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Position position = (Position) o;
         return posY == position.posY && posX == position.posX;
     }
@@ -36,5 +43,15 @@ public class Position {
     @Override
     public int hashCode() {
         return Objects.hash(posY, posX);
+    }
+
+    @Override
+    public JSONObject toJson() {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        return posX + " " + posY;
     }
 }
