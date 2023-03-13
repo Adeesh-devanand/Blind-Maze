@@ -1,7 +1,5 @@
 package ui;
 
-import model.Game;
-
 public class ConsoleOutput {
     private Page page;
     private final Game game;
@@ -61,6 +59,7 @@ public class ConsoleOutput {
         System.out.println("\to -> open maze");
         System.out.println("\tc -> create new maze");
         System.out.println("\tt -> toggle mode");
+        System.out.println("\tl -> load previous game");
         System.out.println("\te -> exit");
     }
 

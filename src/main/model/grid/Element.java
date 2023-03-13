@@ -6,7 +6,7 @@ import persistence.Writable;
 
 public abstract class Element {
     private Position position;
-    private String type;
+    private final String type;
     private String icon;
 
     protected Element(Position position, String type) {
@@ -24,9 +24,9 @@ public abstract class Element {
         this.position = position;
     }
 
-    protected String getIcon() {
-        return icon;
-    }
+//    protected String getIcon() {
+//        return icon;
+//    }
 
     protected String getType() {
         return type;

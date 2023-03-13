@@ -44,8 +44,7 @@ public class Maze implements Writable {
         int gridSize = gridJson.getInt("gridSize");
         String cursorPos = gridJson.getString("cursorPos");
         JSONObject internalGridJson = gridJson.getJSONObject("internalGrid");
-        Grid grid = new Grid(gridSize, cursorPos, internalGridJson);
-        return grid;
+        return new Grid(gridSize, cursorPos, internalGridJson);
     }
 
     //MODIFIES: this
@@ -60,14 +59,12 @@ public class Maze implements Writable {
         return false;
     }
 
-    public boolean moveCursor(String dir) {
+    public void moveCursor(String dir) {
         grid.moveCursor(dir);
-        return true;
     }
 
-    //REQUIRES: y, and x should be in the grid limit
     //MODIFIES: this
-    //EFFECTS: places an entity on the grid
+    //EFFECTS: places an entity on the grid at cursor pos
     public void placeEntity(String entity) throws ElementAlreadyExistsException, OutOfBoundsException {
         Position p = grid.getCursorPos();
         switch (entity) {
@@ -104,6 +101,10 @@ public class Maze implements Writable {
     //         empty, object, player, or monster
     public String getStatus(int x, int y) throws OutOfBoundsException {
         return grid.getStatus(new Position(x, y));
+    }
+
+    protected void setCursorPos(Position pos) throws OutOfBoundsException {
+        grid.setCursorPosition(pos);
     }
 
     @Override

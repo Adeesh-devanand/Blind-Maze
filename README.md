@@ -34,3 +34,6 @@ algorithms.
 - As a user opening a maze in edit mode, I want to be able to place entities on my maze
 - As a user opening a maze in play mode, I want to be able to move my player around
 - As a user opening a maze in play mode, I want to be able to be able to quit
+- As a user, I want to be able to exit the application from the menu
+- As a user, I want the option to save while quiting the application
+- As a user, I want the option to load my previous progress when I run the application

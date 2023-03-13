@@ -18,7 +18,10 @@ public class GridTest {
     Position p3_2;
     Position p4_5;
     Position p5_5;
+    Position p6_6;
     Position p7_7;
+    Position p8_8;
+    Position pneg1_neg1;
 
     @BeforeEach
     public void setup() {
@@ -31,6 +34,8 @@ public class GridTest {
         p4_5 = new Position(5, 4);
         p5_5 = new Position(5, 5);
         p7_7 = new Position(7, 7);
+        p8_8 = new Position(8, 8);
+        pneg1_neg1 = new Position(-1, -1);
     }
 
     @Test
@@ -58,6 +63,15 @@ public class GridTest {
         }
 
         assertThrows(ElementAlreadyExistsException.class, () -> grid.placeObstacle(p0_0));
+        assertThrows(OutOfBoundsException.class, () -> grid.placeObstacle(pneg1_neg1));
+
+        assertThrows(ElementAlreadyExistsException.class, () -> grid.setPlayerPosition(p0_0));
+        assertThrows(OutOfBoundsException.class, () -> grid.setPlayerPosition(p8_8));
+
+        assertThrows(ElementAlreadyExistsException.class, () -> grid.setMonsterPosition(p0_1));
+        assertThrows(OutOfBoundsException.class, () -> grid.setMonsterPosition(p8_8));
+
+        assertThrows(OutOfBoundsException.class, () -> grid.setCursorPosition(pneg1_neg1));
     }
 
     @Test
@@ -95,6 +109,12 @@ public class GridTest {
             assertEquals("Obstacle", grid.getStatus(p7_7));
             assertEquals("Monster", grid.getStatus(p7_6));
 
+            assertThrows(RuntimeException.class, () -> grid.moveCursor("u"));
+
+            grid.moveCursor("d");
+            assertEquals(new Position(0, 1), grid.getCursorPos());
+
+
             try {
                 grid.moveMonster("d");
             } catch (ContactException e) {
@@ -108,8 +128,12 @@ public class GridTest {
     }
 
     @Test
-    public void jsonTest(){
-        Grid grid1 = new Grid(3);
-        grid1.toJson();
+    public void contactTest() {
+        try {
+            grid.setMonsterPosition(p0_1);
+            assertThrows(ContactException.class, () -> grid.movePlayer("d"));
+        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+            fail();
+        }
     }
 }

@@ -8,6 +8,6 @@ public abstract class StationaryElement extends Element {
         super(null, type);
     }
 
-    @Override
-    public void setPosition(Position position){}
+//    @Override
+//    public void setPosition(Position position){}
 }

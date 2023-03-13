@@ -1,8 +1,7 @@
 package ui;
 
-import model.Game;
 import model.exceptions.MazeAlreadyExistsException;
-import model.exceptions.MazeDoesNotExistExcption;
+import model.exceptions.MazeDoesNotExistException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 
@@ -11,12 +10,12 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Controller {
-    private static final String JSON_STORE = "./data/MazeGame.json";
+    private static final String JSON_STORE = "./data/testReaderNewGame.json";
     private Game game;
     private ConsoleOutput consoleOutput;
-    private Scanner scn;
-    private JsonReader reader;
-    private JsonWriter writer;
+    private final Scanner scn;
+    private final JsonReader reader;
+    private final JsonWriter writer;
 
     public Controller() {
         game = new Game();
@@ -102,7 +101,7 @@ public class Controller {
             game.selectMaze(name);
             consoleOutput.setPage(ConsoleOutput.Page.GAME);
             game.setRunning(true);
-        } catch (MazeDoesNotExistExcption e) {
+        } catch (MazeDoesNotExistException e) {
             System.out.println("Maze doesn't exist");
             openMaze();
         }

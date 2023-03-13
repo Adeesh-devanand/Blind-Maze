@@ -1,6 +1,6 @@
 package persistence;
 
-import model.Game;
+import ui.Game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 
 public class JsonReader {
-    private String source;
+    private final String source;
 
     // EFFECTS: constructs reader to read from source file
     public JsonReader(String source) {
@@ -24,7 +24,7 @@ public class JsonReader {
         StringBuilder contentBuilder = new StringBuilder();
 
         try (Stream<String> stream = Files.lines(Paths.get(source), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> contentBuilder.append(s));
+            stream.forEach(contentBuilder::append);
         }
 
         return contentBuilder.toString();
@@ -37,12 +37,16 @@ public class JsonReader {
     }
 
     private Game parseGame(JSONObject jsonObject) {
-        JSONObject currMaze = jsonObject.getJSONObject("currMaze");
+        JSONObject currMaze = null;
+        try {
+            currMaze = jsonObject.getJSONObject("currMaze");
+        } catch (Exception e) {
+            //pass
+        }
         JSONArray mazeList = jsonObject.getJSONArray("mazeList");
         boolean gameRunning = jsonObject.getBoolean("gameRunning");
         boolean editMode = jsonObject.getBoolean("editMode");
         int playerVisibility = jsonObject.getInt("playerVisibility");
-        Game game = new Game(currMaze, mazeList, gameRunning, editMode, playerVisibility);
-        return game;
+        return new Game(currMaze, mazeList, gameRunning, editMode, playerVisibility);
     }
 }

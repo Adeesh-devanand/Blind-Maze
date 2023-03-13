@@ -1,9 +1,9 @@
 /*
-* Handles all the computation and back-end functioning
-* keeps a track of the grid for the maze along with the elements and their respective positions
-*
-* NOTE: All positions start from the top left corner i.e top left is (0, 0)
-* 'y' represents the y axes, and 'x' represents the x axes */
+ * Handles all the computation and back-end functioning
+ * keeps a track of the grid for the maze along with the elements and their respective positions
+ *
+ * NOTE: All positions start from the top left corner i.e top left is (0, 0)
+ * 'y' represents the y axes, and 'x' represents the x axes */
 
 package model.grid;
 
@@ -11,7 +11,6 @@ import model.Position;
 import model.exceptions.ContactException;
 import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
 
@@ -25,13 +24,13 @@ public class Grid implements Writable {
 
     private Player player;
     private Monster monster;
-    private Cursor cursor;
+    private final Cursor cursor;
 
 
     //EFFECTS: Creates an Empty Grid of size (x across by y down)
     public Grid(int gridSize) {
         this.gridSize = gridSize;
-        grid = new HashMap<Position, Element>();
+        grid = new HashMap<>();
 
         Position temp;
         for (int i = 0; i < gridSize; i++) {
@@ -64,8 +63,6 @@ public class Grid implements Writable {
                     break;
                 case "Obstacle":
                     this.grid.put(key, new Obstacle());
-                    break;
-                default:
             }
         }
 
@@ -85,7 +82,6 @@ public class Grid implements Writable {
 
         Map<Position, Element> grid = new HashMap<>();
         Iterator<String> keys = internalGridJson.keys();
-
 
         while (keys.hasNext()) {
             String key = keys.next();
@@ -117,10 +113,10 @@ public class Grid implements Writable {
     //MODIFIES: this
     //EFFECTS: Places Obstacle on grid at given position
     public void placeObstacle(Position position) throws ElementAlreadyExistsException, OutOfBoundsException {
-        if (!isWithinBounds(position)) {
+        if (isOutOfBounds(position)) {
             throw new OutOfBoundsException();
         }
-        if (!isCellEmpty(position)) {
+        if (isCellOccupied(position)) {
             throw new ElementAlreadyExistsException();
         }
         grid.replace(position, new Obstacle());
@@ -130,10 +126,10 @@ public class Grid implements Writable {
     //MODIFIES: this
     //EFFECTS: Places Player on grid at given position
     public void setPlayerPosition(Position position) throws ElementAlreadyExistsException, OutOfBoundsException {
-        if (!isWithinBounds(position)) {
+        if (isOutOfBounds(position)) {
             throw new OutOfBoundsException();
         }
-        if (!isCellEmpty(position)) {
+        if (isCellOccupied(position)) {
             throw new ElementAlreadyExistsException();
         }
         clearCell(player.getPosition());
@@ -145,21 +141,20 @@ public class Grid implements Writable {
     //MODIFIES: this
     //EFFECTS: Places Monster on grid at given position
     public void setMonsterPosition(Position position) throws ElementAlreadyExistsException, OutOfBoundsException {
-        if (!isCellEmpty(position)) {
-            throw new ElementAlreadyExistsException();
-        }
-        if (!isWithinBounds(position)) {
+        if (isOutOfBounds(position)) {
             throw new OutOfBoundsException();
         }
+        if (isCellOccupied(position)) {
+            throw new ElementAlreadyExistsException();
+        }
 
-        assert grid.containsKey(monster.getPosition());
         clearCell(monster.getPosition());
         monster.setPosition(position);
         grid.replace(position, monster);
     }
 
     public void setCursorPosition(Position position) throws OutOfBoundsException {
-        if (!isWithinBounds(position)) {
+        if (isOutOfBounds(position)) {
             throw new OutOfBoundsException();
         }
         cursor.setPosition(position);
@@ -198,8 +193,8 @@ public class Grid implements Writable {
         Position newPos = getNextPos(cursor, dir);
         try {
             setCursorPosition(newPos);
-        } catch (OutOfBoundsException ignored) {
-            ;
+        } catch (OutOfBoundsException e) {
+            throw new RuntimeException();
         }
     }
 
@@ -242,7 +237,7 @@ public class Grid implements Writable {
     //EFFECTS: returns the status at given grid Position
     //String is one of "o", "p", "m", "e"//
     public String getStatus(Position position) throws OutOfBoundsException {
-        if (!isWithinBounds(position)) {
+        if (isOutOfBounds(position)) {
             throw new OutOfBoundsException();
         }
         Element e = grid.get(position);
@@ -257,16 +252,16 @@ public class Grid implements Writable {
     }
 
     //EFFECTS: returns if the given position is empty or not
-    public boolean isCellEmpty(Position position) {
+    public boolean isCellOccupied(Position position) {
         Element e = grid.get(position);
-        return "Empty".equals(e.getType());
+        return !"Empty".equals(e.getType());
     }
 
     //EFFECTS: returns if the given Position is within grid limits
-    private boolean isWithinBounds(Position position) {
+    private boolean isOutOfBounds(Position position) {
         int x = position.getPosX();
         int y = position.getPosY();
-        return x >= 0 && y >= 0 && x < gridSize && y < gridSize;
+        return x < 0 || y < 0 || x >= gridSize || y >= gridSize;
     }
 
     public int getSize() {
@@ -281,9 +276,7 @@ public class Grid implements Writable {
 
         JSONObject jsonGrid = new JSONObject();
 
-        Iterator<Map.Entry<Position, Element>> it = grid.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<Position, Element> pairs = it.next();
+        for (Map.Entry<Position, Element> pairs : grid.entrySet()) {
             jsonGrid.put(pairs.getKey().toString(), pairs.getValue().toString());
         }
 

@@ -1,5 +1,7 @@
-package model;
+package ui;
 
+import model.Maze;
+import model.Position;
 import model.exceptions.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -26,7 +28,9 @@ public class Game implements Writable {
         this.editMode = editMode;
         this.playerVisibilty = playerVisibility;
         this.mazeList = parseMazeList(mazeList);
-        this.currMaze = parseMaze(currMaze);
+        if (currMaze != null) {
+            this.currMaze = parseMaze(currMaze);
+        }
     }
 
     private Map<String, Maze> parseMazeList(JSONArray mazeList) {
@@ -43,8 +47,7 @@ public class Game implements Writable {
     private Maze parseMaze(JSONObject mazeJson) {
         String name = mazeJson.getString("name");
         JSONObject grid = mazeJson.getJSONObject("grid");
-        Maze maze = new Maze(name, grid);
-        return maze;
+        return new Maze(name, grid);
     }
 
     public void setRunning(boolean gameRunning) {
@@ -124,11 +127,11 @@ public class Game implements Writable {
         return mazeList.isEmpty();
     }
 
-    public void selectMaze(String name) throws MazeDoesNotExistExcption {
+    public void selectMaze(String name) throws MazeDoesNotExistException {
         Maze tempMaze = mazeList.get(name);
 
         if (tempMaze == null) {
-            throw new MazeDoesNotExistExcption();
+            throw new MazeDoesNotExistException();
         }
 
         currMaze = tempMaze;
@@ -199,9 +202,7 @@ public class Game implements Writable {
 
     private JSONArray mazeListToJsonObject() {
         JSONArray json = new JSONArray();
-        Iterator<Map.Entry<String, Maze>> it = mazeList.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Maze> pairs = it.next();
+        for (Map.Entry<String, Maze> pairs : mazeList.entrySet()) {
             json.put(pairs.getValue().toJson());
         }
         return json;
