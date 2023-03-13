@@ -1,8 +1,6 @@
 package model;
 
 import model.exceptions.*;
-import model.grid.Element;
-import model.grid.Grid;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
@@ -24,6 +22,29 @@ public class Game implements Writable {
     }
 
     public Game(JSONObject currMaze, JSONArray mazeList, boolean gameRunning, boolean editMode, int playerVisibility) {
+        this.gameRunning = gameRunning;
+        this.editMode = editMode;
+        this.playerVisibilty = playerVisibility;
+        this.mazeList = parseMazeList(mazeList);
+        this.currMaze = parseMaze(currMaze);
+    }
+
+    private Map<String, Maze> parseMazeList(JSONArray mazeList) {
+        Map<String, Maze> mazeMap = new HashMap<>();
+
+        for (Object json : mazeList) {
+            JSONObject mazeJson = (JSONObject) json;
+            Maze tempMaze = parseMaze(mazeJson);
+            mazeMap.put(tempMaze.getName(), tempMaze);
+        }
+        return mazeMap;
+    }
+
+    private Maze parseMaze(JSONObject mazeJson) {
+        String name = mazeJson.getString("name");
+        JSONObject grid = mazeJson.getJSONObject("grid");
+        Maze maze = new Maze(name, grid);
+        return maze;
     }
 
     public void setRunning(boolean gameRunning) {

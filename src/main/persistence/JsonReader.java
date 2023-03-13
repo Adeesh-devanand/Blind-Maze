@@ -43,6 +43,6 @@ public class JsonReader {
         boolean editMode = jsonObject.getBoolean("editMode");
         int playerVisibility = jsonObject.getInt("playerVisibility");
         Game game = new Game(currMaze, mazeList, gameRunning, editMode, playerVisibility);
-        return null;
+        return game;
     }
 }

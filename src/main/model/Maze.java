@@ -35,6 +35,19 @@ public class Maze implements Writable {
         this.grid = new Grid(oldMaze.grid);//you can access
     }
 
+    public Maze(String name, JSONObject grid) {
+        this.name = name;
+        this.grid = parseGrid(grid);
+    }
+
+    private Grid parseGrid(JSONObject gridJson) {
+        int gridSize = gridJson.getInt("gridSize");
+        String cursorPos = gridJson.getString("cursorPos");
+        JSONObject internalGridJson = gridJson.getJSONObject("internalGrid");
+        Grid grid = new Grid(gridSize, cursorPos, internalGridJson);
+        return grid;
+    }
+
     //MODIFIES: this
     //EFFECTS: - moves player on the grid if it is a valid setPosition,
     //         - returns whether the player made contact with the monster

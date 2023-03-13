@@ -20,6 +20,12 @@ public class Position implements Writable {
         posY = y;
     }
 
+    public Position(String str) {
+        String[] pos = str.split(" ");
+        this.posX = Integer.parseInt(pos[0]);
+        this.posY = Integer.parseInt(pos[1]);
+    }
+
     public int getPosX() {
         return posX;
     }

@@ -25,12 +25,6 @@ public class JsonWriter {
     }
 
     // MODIFIES: this
-    // EFFECTS: writes JSON obj to file
-    public void write(JSONObject json) {
-        saveToFile(json.toString(TAB));
-    }
-
-    // MODIFIES: this
     // EFFECTS: closes writer
     public void close() {
         writer.close();

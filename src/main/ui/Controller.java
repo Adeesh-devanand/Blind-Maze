@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Controller {
-    private static final String JSON_STORE = "./data/workroom.json";
+    private static final String JSON_STORE = "./data/MazeGame.json";
     private Game game;
     private ConsoleOutput consoleOutput;
     private Scanner scn;
@@ -58,6 +58,7 @@ public class Controller {
         try {
             game = reader.loadGame();
             System.out.println("Loaded Previous Session from " + JSON_STORE);
+            consoleOutput = new ConsoleOutput(game);
             if (game.isRunning()) {
                 consoleOutput.setPage(ConsoleOutput.Page.GAME);
             }

@@ -78,6 +78,41 @@ public class Grid implements Writable {
         grid.put(this.cursor.getPosition(), this.cursor);
     }
 
+    @SuppressWarnings("methodlength")
+    public Grid(int gridSize, String cursorPos, JSONObject internalGridJson) {
+        this.gridSize = gridSize;
+        this.cursor = new Cursor(new Position(cursorPos));
+
+        Map<Position, Element> grid = new HashMap<>();
+        Iterator<String> keys = internalGridJson.keys();
+
+
+        while (keys.hasNext()) {
+            String key = keys.next();
+            String type = internalGridJson.getString(key);
+            Position position = new Position(key);
+            switch (type) {
+                case "Obstacle":
+                    grid.put(position, new Obstacle());
+                    break;
+                case "Player":
+                    Player player = new Player(position);
+                    grid.put(position, player);
+                    this.player = player;
+                    break;
+                case "Monster":
+                    Monster monster = new Monster(position);
+                    grid.put(position, monster);
+                    this.monster = monster;
+                    break;
+                default:
+                    grid.put(position, new Empty());
+            }
+        }
+
+        this.grid = grid;
+    }
+
     //REQUIRES: Position p should be empty, and be within grid limits
     //MODIFIES: this
     //EFFECTS: Places Obstacle on grid at given position
@@ -244,11 +279,15 @@ public class Grid implements Writable {
         json.put("gridSize", gridSize);
         json.put("cursorPos", getCursorPos().toString());
 
+        JSONObject jsonGrid = new JSONObject();
+
         Iterator<Map.Entry<Position, Element>> it = grid.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Position, Element> pairs = it.next();
-            json.put(pairs.getKey().toString(), pairs.getValue().toString());
+            jsonGrid.put(pairs.getKey().toString(), pairs.getValue().toString());
         }
+
+        json.put("internalGrid", jsonGrid);
         return json;
     }
 }

@@ -21,7 +21,7 @@ public class ConsoleOutput {
     }
 
     public void drawApplication() {
-        if (game.isRunning()) {
+        if (!game.isRunning() && page == Page.GAME) {
             page = Page.MAIN;
         }
         switch (page) {
