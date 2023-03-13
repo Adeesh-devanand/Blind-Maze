@@ -1,11 +1,10 @@
 package persistence;
 
-import model.exceptions.MazeAlreadyExistsException;
+import ui.exceptions.MazeAlreadyExistsException;
 import org.junit.jupiter.api.Test;
 import ui.Game;
 
 import java.io.IOException;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -1,9 +1,9 @@
 package ui;
 
-import model.exceptions.MazeAlreadyExistsException;
-import model.exceptions.MazeDoesNotExistException;
 import persistence.JsonReader;
 import persistence.JsonWriter;
+import ui.exceptions.MazeAlreadyExistsException;
+import ui.exceptions.MazeDoesNotExistException;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package persistence;
 
-import model.exceptions.MazeDoesNotExistException;
+import ui.exceptions.MazeDoesNotExistException;
 import org.junit.jupiter.api.Test;
 import ui.Game;
 

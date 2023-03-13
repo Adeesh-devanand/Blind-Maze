@@ -6,6 +6,8 @@ import model.exceptions.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import persistence.Writable;
+import ui.exceptions.MazeAlreadyExistsException;
+import ui.exceptions.MazeDoesNotExistException;
 
 import java.util.*;
 
