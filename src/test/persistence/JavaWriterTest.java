@@ -2,7 +2,7 @@ package persistence;
 
 import ui.exceptions.MazeAlreadyExistsException;
 import org.junit.jupiter.api.Test;
-import ui.Game;
+import model.Game;
 
 import java.io.IOException;
 

@@ -1,6 +1,6 @@
 package persistence;
 
-import ui.Game;
+import model.Game;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -32,21 +32,7 @@ public class JsonReader {
 
     public Game loadGame() throws IOException {
         String jsonData = readFile(source);
-        JSONObject jsonObject = new JSONObject(jsonData);
-        return parseGame(jsonObject);
-    }
-
-    private Game parseGame(JSONObject jsonObject) {
-        JSONObject currMaze = null;
-        try {
-            currMaze = jsonObject.getJSONObject("currMaze");
-        } catch (Exception e) {
-            //pass
-        }
-        JSONArray mazeList = jsonObject.getJSONArray("mazeList");
-        boolean gameRunning = jsonObject.getBoolean("gameRunning");
-        boolean editMode = jsonObject.getBoolean("editMode");
-        int playerVisibility = jsonObject.getInt("playerVisibility");
-        return new Game(currMaze, mazeList, gameRunning, editMode, playerVisibility);
+        JSONObject gameJson = new JSONObject(jsonData);
+        return new Game(gameJson);
     }
 }

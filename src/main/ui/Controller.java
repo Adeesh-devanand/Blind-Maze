@@ -1,5 +1,6 @@
 package ui;
 
+import model.Game;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 import ui.exceptions.MazeAlreadyExistsException;

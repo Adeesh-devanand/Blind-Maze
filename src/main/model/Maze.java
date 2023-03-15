@@ -35,16 +35,10 @@ public class Maze implements Writable {
         this.grid = new Grid(oldMaze.grid);//you can access
     }
 
-    public Maze(String name, JSONObject grid) {
-        this.name = name;
-        this.grid = parseGrid(grid);
-    }
-
-    private Grid parseGrid(JSONObject gridJson) {
-        int gridSize = gridJson.getInt("gridSize");
-        String cursorPos = gridJson.getString("cursorPos");
-        JSONObject internalGridJson = gridJson.getJSONObject("internalGrid");
-        return new Grid(gridSize, cursorPos, internalGridJson);
+    public Maze(JSONObject mazeJson) {
+        JSONObject gridJson = mazeJson.getJSONObject("grid");
+        this.name = mazeJson.getString("name");
+        this.grid = new Grid(gridJson);
     }
 
     //MODIFIES: this
@@ -72,7 +66,7 @@ public class Maze implements Writable {
                 grid.setPlayerPosition(p);
                 break;
             case "Obstacle":
-                grid.placeObstacle(p);
+                grid.setObstacle(p);
                 break;
             case "Monster":
                 grid.setMonsterPosition(p);

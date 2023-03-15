@@ -1,5 +1,7 @@
 package ui;
 
+import model.Game;
+
 public class ConsoleOutput {
     private Page page;
     private final Game game;

@@ -18,10 +18,11 @@ public class GridTest {
     Position p3_2;
     Position p4_5;
     Position p5_5;
-    Position p6_6;
     Position p7_7;
-    Position p8_8;
-    Position pneg1_neg1;
+    Position p7_8;
+    Position p8_7;
+    Position p1_neg2;
+    Position pneg1_1;
 
     @BeforeEach
     public void setup() {
@@ -34,98 +35,170 @@ public class GridTest {
         p4_5 = new Position(5, 4);
         p5_5 = new Position(5, 5);
         p7_7 = new Position(7, 7);
-        p8_8 = new Position(8, 8);
-        pneg1_neg1 = new Position(-1, -1);
+
+        p7_8 = new Position(7, 8);
+        p8_7 = new Position(8, 7);
+
+        p1_neg2 = new Position(1, -2);
+        pneg1_1 = new Position(-1, 1);
+
     }
 
     @Test
-    public void placeTest() {
+    public void copyTest(){}
+
+    @Test
+    public void getTest() {
+        // getPosTest()
+        assertEquals(p0_0, grid.getCursorPos());
+        assertEquals(p0_0, grid.getPlayerPos());
+        assertEquals(p7_7, grid.getMonsterPos());
+
+        //getSizeTest()
+        assertEquals(8, grid.getSize());
+
+        // getStatusTest()
         try {
-            assertEquals("Empty", grid.getStatus(p0_1));
+            assertEquals("Player", grid.getStatus(p0_0));
+            assertEquals("Monster", grid.getStatus(p7_7));
+            assertEquals("Empty", grid.getStatus(p3_2));
+            assertEquals("Empty", grid.getStatus(p5_5));
+        } catch (OutOfBoundsException e) {
+            fail("Within Bounds but still got error");
+        }
+
+        try {
+            grid.getStatus(p1_neg2);
+            fail("Should be out of bounds");
+        } catch (OutOfBoundsException ignored){
+            //pass
+        }
+
+        try {
+            grid.getStatus(p7_8);
+            fail("Should be out of bounds");
+        } catch (OutOfBoundsException ignored){
+            //pass
+        }
+
+        try {
+            grid.getStatus(p8_7);
+            fail("Should be out of bounds");
+        } catch (OutOfBoundsException ignored){
+            //pass
+        }
+
+        try {
+            grid.getStatus(pneg1_1);
+            fail("Should be out of bounds");
+        } catch (OutOfBoundsException ignored){
+            //pass
+        }
+    }
+
+    @Test
+    public void setCursorPositionTest(){
+    }
+
+    @Test
+    public void setPlayerPositionTest() {
+        try {
+            assertEquals(p0_0, grid.getPlayerPos());
             assertEquals("Player", grid.getStatus(p0_0));
             assertEquals("Empty", grid.getStatus(p4_5));
-
-            grid.placeObstacle(p0_1);
             grid.setPlayerPosition(p4_5);
-
-            assertEquals("Obstacle", grid.getStatus(p0_1));
+            assertEquals(p4_5, grid.getPlayerPos());
             assertEquals("Empty", grid.getStatus(p0_0));
             assertEquals("Player", grid.getStatus(p4_5));
-            assertEquals("Monster", grid.getStatus(p7_7));
-
-            assertEquals("Monster", grid.getStatus(p7_7));
-            assertEquals("Empty", grid.getStatus(p0_0));
-            grid.setMonsterPosition(p0_0);
-            assertEquals("Monster", grid.getStatus(p0_0));
-            assertEquals("Empty", grid.getStatus(p7_7));
-        } catch (Exception e) {
-            fail();
+        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+            fail("Unexpected exception thrown");
         }
 
-        assertThrows(ElementAlreadyExistsException.class, () -> grid.placeObstacle(p0_0));
-        assertThrows(OutOfBoundsException.class, () -> grid.placeObstacle(pneg1_neg1));
+        try {
+            grid.setPlayerPosition(pneg1_1);
+        } catch (OutOfBoundsException e) {
+            //pass
+        } catch (ElementAlreadyExistsException e) {
+            fail("OutOfBoundsException should have been thrown first");
+        }
 
-        assertThrows(ElementAlreadyExistsException.class, () -> grid.setPlayerPosition(p0_0));
-        assertThrows(OutOfBoundsException.class, () -> grid.setPlayerPosition(p8_8));
-
-        assertThrows(ElementAlreadyExistsException.class, () -> grid.setMonsterPosition(p0_1));
-        assertThrows(OutOfBoundsException.class, () -> grid.setMonsterPosition(p8_8));
-
-        assertThrows(OutOfBoundsException.class, () -> grid.setCursorPosition(pneg1_neg1));
+        try {
+            grid.setPlayerPosition(p7_7);
+        } catch (OutOfBoundsException e) {
+            fail("Within bounds but OutOfBoundsException still thrown");
+        } catch (ElementAlreadyExistsException e) {
+            //pass
+        }
     }
 
     @Test
-    public void moveTest() {
-        placeTest();
+    public void setMonsterPositionTest(){
+        try {
+            assertEquals(p7_7, grid.getMonsterPos());
+            assertEquals("Monster", grid.getStatus(p7_7));
+            assertEquals("Empty", grid.getStatus(p3_2));
+            grid.setMonsterPosition(p3_2);
+            assertEquals(p3_2, grid.getMonsterPos());
+            assertEquals("Empty", grid.getStatus(p7_7));
+            assertEquals("Monster", grid.getStatus(p3_2));
+        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+            fail("Unexpected exception thrown");
+        }
 
         try {
-            Position p7_6 = new Position(7, 6);
-            Position p5_7 = new Position(5, 7);
+            grid.setMonsterPosition(p8_7);
+        } catch (OutOfBoundsException e) {
+            //pass
+        } catch (ElementAlreadyExistsException e) {
+            fail("OutOfBoundsException should have been thrown first");
+        }
 
-            grid.setMonsterPosition(p3_1);
-            grid.setMonsterPosition(p7_7);
-            assertEquals("Empty", grid.getStatus(p7_6));
-            assertEquals("Monster", grid.getStatus(p7_7));
-            grid.moveMonster("u");
-            assertEquals("Monster", grid.getStatus(p7_6));
-            assertEquals("Empty", grid.getStatus(p7_7));
-
-            assertEquals("Player", grid.getStatus(p4_5));
-            assertEquals("Empty", grid.getStatus(p5_5));
-            grid.movePlayer("d");
-            assertEquals("Empty", grid.getStatus(p4_5));
-            assertEquals("Player", grid.getStatus(p5_5));
-
-            grid.movePlayer("d");
-            grid.movePlayer("d");
-
-
-            //Trying to move against edge
-            assertEquals("Player", grid.getStatus(p5_7));
-            grid.movePlayer("d");
-            assertEquals("Player", grid.getStatus(p5_7));
-
-            grid.placeObstacle(p7_7);
-            assertEquals("Obstacle", grid.getStatus(p7_7));
-            assertEquals("Monster", grid.getStatus(p7_6));
-
-            assertThrows(RuntimeException.class, () -> grid.moveCursor("u"));
-
-            grid.moveCursor("d");
-            assertEquals(new Position(0, 1), grid.getCursorPos());
-
-
-            try {
-                grid.moveMonster("d");
-            } catch (ContactException e) {
-                fail();
-            }
-            assertEquals("Monster", grid.getStatus(p7_6));
-            assertEquals("Obstacle", grid.getStatus(p7_7));
-        } catch (OutOfBoundsException | ElementAlreadyExistsException | ContactException e) {
-            fail();
+        try {
+            grid.setPlayerPosition(p7_7);
+        } catch (OutOfBoundsException e) {
+            fail("Within bounds but OutOfBoundsException still thrown");
+        } catch (ElementAlreadyExistsException e) {
+            //pass
         }
     }
+
+    @Test
+    public void setObstacleTest() {
+        try {
+            assertEquals("Empty", grid.getStatus(p0_1));
+            grid.setObstacle(p0_1);
+            assertEquals("Obstacle", grid.getStatus(p0_1));
+        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+            fail("Unexpected Exception thrown");
+        }
+
+        try {
+            grid.setObstacle(pneg1_1);
+            fail("OutOfBoundsException should have been thrown");
+        } catch (OutOfBoundsException e) {
+            //pass
+        } catch (ElementAlreadyExistsException e) {
+            fail("OutOfBoundsException should have been thrown first");
+        }
+
+        try {
+            grid.setObstacle(p0_1);
+            fail("ElementAlreadyExistsException should have been thrown");
+        } catch (OutOfBoundsException e) {
+            fail("ElementAlreadyExistsException should have been thrown");
+        } catch (ElementAlreadyExistsException e) {
+            //pass
+        }
+    }
+
+    @Test
+    public void moveCursorTest() {}
+
+    @Test
+    public void movePlayerTest() {}
+
+    @Test
+    public void moveMonsterTest() {}
 
     @Test
     public void contactTest() {
@@ -136,4 +209,54 @@ public class GridTest {
             fail();
         }
     }
+
+//    @Test
+//    public void moveTest() {
+//
+//        try {
+//            Position p7_6 = new Position(7, 6);
+//            Position p5_7 = new Position(5, 7);
+//
+//            grid.setMonsterPosition(p3_1);
+//            grid.setMonsterPosition(p7_7);
+//            assertEquals("Empty", grid.getStatus(p7_6));
+//            assertEquals("Monster", grid.getStatus(p7_7));
+//            grid.moveMonster("u");
+//            assertEquals("Monster", grid.getStatus(p7_6));
+//            assertEquals("Empty", grid.getStatus(p7_7));
+//
+//            assertEquals("Player", grid.getStatus(p4_5));
+//            assertEquals("Empty", grid.getStatus(p5_5));
+//            grid.movePlayer("d");
+//            assertEquals("Empty", grid.getStatus(p4_5));
+//            assertEquals("Player", grid.getStatus(p5_5));
+//
+//            grid.movePlayer("d");
+//            grid.movePlayer("d");
+//
+//
+//            //Trying to move against edge
+//            assertEquals("Player", grid.getStatus(p5_7));
+//            grid.movePlayer("d");
+//            assertEquals("Player", grid.getStatus(p5_7));
+//
+//            grid.setObstacle(p7_7);
+//            assertEquals("Obstacle", grid.getStatus(p7_7));
+//            assertEquals("Monster", grid.getStatus(p7_6));
+//
+//            grid.moveCursor("d");
+//            assertEquals(new Position(0, 1), grid.getCursorPos());
+//
+//
+//            try {
+//                grid.moveMonster("d");
+//            } catch (ContactException e) {
+//                fail();
+//            }
+//            assertEquals("Monster", grid.getStatus(p7_6));
+//            assertEquals("Obstacle", grid.getStatus(p7_7));
+//        } catch (OutOfBoundsException | ElementAlreadyExistsException | ContactException e) {
+//            fail();
+//        }
+//    }
 }

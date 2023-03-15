@@ -1,9 +1,8 @@
 package persistence;
 
-import ui.Game;
+import model.Game;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 

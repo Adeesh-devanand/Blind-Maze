@@ -1,7 +1,5 @@
-package ui;
+package model;
 
-import model.Maze;
-import model.Position;
 import model.exceptions.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +11,7 @@ import java.util.*;
 
 public class Game implements Writable {
     private boolean gameRunning;
-    private final int playerVisibilty;
+    private final int playerVisibility;
     private final Map<String, Maze> mazeList;
     private Maze currMaze;
     private boolean editMode;
@@ -21,18 +19,23 @@ public class Game implements Writable {
     public Game() {
         gameRunning = false;
         editMode = true;
-        playerVisibilty = 2;
+        playerVisibility = 2;
         mazeList = new HashMap<>();
     }
 
-    public Game(JSONObject currMaze, JSONArray mazeList, boolean gameRunning, boolean editMode, int playerVisibility) {
-        this.gameRunning = gameRunning;
-        this.editMode = editMode;
-        this.playerVisibilty = playerVisibility;
-        this.mazeList = parseMazeList(mazeList);
-        if (currMaze != null) {
-            this.currMaze = parseMaze(currMaze);
+    public Game(JSONObject gameJson) {
+        try {
+            JSONObject currMaze = gameJson.getJSONObject("currMaze");
+            this.currMaze = new Maze(currMaze);
+        } catch (Exception e) {
+            //pass
         }
+
+        JSONArray mazeList = gameJson.getJSONArray("mazeList");
+        this.mazeList = parseMazeList(mazeList);
+        gameRunning = gameJson.getBoolean("gameRunning");
+        editMode = gameJson.getBoolean("editMode");
+        playerVisibility = gameJson.getInt("playerVisibility");
     }
 
     private Map<String, Maze> parseMazeList(JSONArray mazeList) {
@@ -40,16 +43,10 @@ public class Game implements Writable {
 
         for (Object json : mazeList) {
             JSONObject mazeJson = (JSONObject) json;
-            Maze tempMaze = parseMaze(mazeJson);
+            Maze tempMaze = new Maze(mazeJson);
             mazeMap.put(tempMaze.getName(), tempMaze);
         }
         return mazeMap;
-    }
-
-    private Maze parseMaze(JSONObject mazeJson) {
-        String name = mazeJson.getString("name");
-        JSONObject grid = mazeJson.getJSONObject("grid");
-        return new Maze(name, grid);
     }
 
     public void setRunning(boolean gameRunning) {
@@ -169,14 +166,14 @@ public class Game implements Writable {
     }
 
     private String[][] getPlayerGrid() {
-        String[][] grid = new String[2 * playerVisibilty + 1][2 * playerVisibilty + 1];
+        String[][] grid = new String[2 * playerVisibility + 1][2 * playerVisibility + 1];
         Position playerPos = currMaze.getPlayerPosition();
         int x = playerPos.getPosX();
         int y = playerPos.getPosY();
-        for (int i = 0; i <= x + 2 * playerVisibilty; i++) {
-            for (int j = 0; j <= y + 2 * playerVisibilty; j++) {
+        for (int i = 0; i <= x + 2 * playerVisibility; i++) {
+            for (int j = 0; j <= y + 2 * playerVisibility; j++) {
                 try {
-                    grid[i][j] = currMaze.getStatus(i - playerVisibilty, j - playerVisibilty);
+                    grid[i][j] = currMaze.getStatus(i - playerVisibility, j - playerVisibility);
                 } catch (OutOfBoundsException e) {
                     grid[i][j] = "~";
                 }
@@ -190,12 +187,11 @@ public class Game implements Writable {
         JSONObject json = new JSONObject();
 
         json.put("gameRunning", gameRunning);
-        json.put("playerVisibility", playerVisibilty);
+        json.put("playerVisibility", playerVisibility);
         json.put("mazeList", mazeListToJsonObject());
         try {
             json.put("currMaze", currMaze.toJson());
         } catch (NullPointerException ignore) {
-            ;
         }
 
         json.put("editMode", editMode);
