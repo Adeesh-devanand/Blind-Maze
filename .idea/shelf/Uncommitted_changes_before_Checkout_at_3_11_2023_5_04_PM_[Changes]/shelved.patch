@@ -1,0 +1,214 @@
+Index: src/main/ui/ConsoleInterface.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>/*\r\n * Controls all the interactions between the model and the User\r\n * Responsible for the Console based GUI\r\n * Displays a menu from where user prompts funnel the user through the application\r\n * Acts as both a controller and a View class */\r\n\r\n//TODO: for GUI approach, remove all View functionalities and treat it as a controller\r\n\r\npackage ui;\r\n\r\nimport com.googlecode.lanterna.gui2.WindowBasedTextGUI;\r\nimport com.googlecode.lanterna.input.KeyStroke;\r\nimport com.googlecode.lanterna.screen.Screen;\r\nimport com.googlecode.lanterna.terminal.DefaultTerminalFactory;\r\n\r\nimport java.io.IOException;\r\n\r\npublic class ConsoleInterface {\r\n    private Screen screen;\r\n    private Controller controller;\r\n    private WindowBasedTextGUI textGUI;\r\n\r\n    //EFFECTS: initializes the ConsoleInterface and runs the Menu till the user quits\r\n    public ConsoleInterface() throws IOException {\r\n        initialize();\r\n        run();\r\n    }\r\n\r\n    private void initialize() throws IOException {\r\n        screen = new DefaultTerminalFactory().createScreen();\r\n        screen.startScreen();\r\n        controller = new Controller(screen);\r\n    }\r\n\r\n    private void run() throws IOException {\r\n        while (controller.isGameRunning()) {\r\n            KeyStroke inp = screen.readInput();\r\n            controller.updateGame(inp);\r\n            controller.updateScreen();\r\n        }\r\n    }\r\n\r\n}
+===================================================================
+diff --git a/src/main/ui/ConsoleInterface.java b/src/main/ui/ConsoleInterface.java
+--- a/src/main/ui/ConsoleInterface.java	
++++ b/src/main/ui/ConsoleInterface.java	
+@@ -8,36 +8,32 @@
+ 
+ package ui;
+ 
+-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+-import com.googlecode.lanterna.input.KeyStroke;
+-import com.googlecode.lanterna.screen.Screen;
+-import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
+-
+-import java.io.IOException;
++import java.util.Scanner;
+ 
+ public class ConsoleInterface {
+-    private Screen screen;
++    private static final Scanner scnr;
+     private Controller controller;
+-    private WindowBasedTextGUI textGUI;
+ 
+     //EFFECTS: initializes the ConsoleInterface and runs the Menu till the user quits
+-    public ConsoleInterface() throws IOException {
++    public ConsoleInterface() {
++        scnr = new Scanner(System.in);
+         initialize();
+         run();
+     }
+ 
+-    private void initialize() throws IOException {
+-        screen = new DefaultTerminalFactory().createScreen();
+-        screen.startScreen();
+-        controller = new Controller(screen);
++    private void initialize() {
++        controller = new Controller();
+     }
+ 
+-    private void run() throws IOException {
++    private void run() {
+         while (controller.isGameRunning()) {
+-            KeyStroke inp = screen.readInput();
+-            controller.updateGame(inp);
++            getInput();
++            controller.updateGame();
+             controller.updateScreen();
+         }
+     }
+ 
++    private void getInput() {
++    }
++
+ }
+\ No newline at end of file
+Index: src/main/ui/Controller.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package ui;\r\n\r\nimport com.googlecode.lanterna.TerminalPosition;\r\nimport com.googlecode.lanterna.gui2.WindowBasedTextGUI;\r\nimport com.googlecode.lanterna.input.KeyStroke;\r\nimport com.googlecode.lanterna.screen.Screen;\r\nimport model.Game;\r\n\r\nimport java.io.IOException;\r\n\r\npublic class Controller {\r\n    private Game game;\r\n    private Screen screen;\r\n    private boolean inMenu;\r\n    private WindowBasedTextGUI textGUI;\r\n\r\n    public Controller(Screen screen) {\r\n        inMenu = true;\r\n        game = new Game();\r\n        this.screen = screen;\r\n    }\r\n\r\n    public boolean isGameRunning() {\r\n        return game.isGameRunning();\r\n    }\r\n\r\n    public void updateGame(KeyStroke stroke) {\r\n        if (stroke == null) {\r\n            return;\r\n        }\r\n\r\n        String ch = stroke.getCharacter().toString().toLowerCase();\r\n        switch (ch) {\r\n            case \"c\":\r\n            case \"o\":\r\n            case \"q\":\r\n            case \"t\":\r\n                break;\r\n            default:\r\n                game.updateMaze(ch);\r\n        }\r\n    }\r\n\r\n    public void updateScreen() throws IOException {\r\n        screen.setCursorPosition(new TerminalPosition(0, 0));\r\n        screen.clear();\r\n        render();\r\n        screen.refresh();\r\n    }\r\n\r\n    private void render() {\r\n        if (inMenu) {\r\n            drawMenu();\r\n        } else {\r\n            drawMaze();\r\n        }\r\n    }\r\n\r\n    private void drawMenu() {\r\n    }\r\n\r\n    private void drawMaze() {\r\n    }\r\n}\r\n
+===================================================================
+diff --git a/src/main/ui/Controller.java b/src/main/ui/Controller.java
+--- a/src/main/ui/Controller.java	
++++ b/src/main/ui/Controller.java	
+@@ -1,30 +1,23 @@
+ package ui;
+ 
+-import com.googlecode.lanterna.TerminalPosition;
+-import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
+-import com.googlecode.lanterna.input.KeyStroke;
+-import com.googlecode.lanterna.screen.Screen;
+ import model.Game;
+-
+-import java.io.IOException;
++import model.exceptions.ElementAlreadyExistsException;
++import model.exceptions.OutOfBoundsException;
+ 
+ public class Controller {
+     private Game game;
+-    private Screen screen;
+     private boolean inMenu;
+-    private WindowBasedTextGUI textGUI;
+ 
+-    public Controller(Screen screen) {
++    public Controller() {
+         inMenu = true;
+         game = new Game();
+-        this.screen = screen;
+     }
+ 
+     public boolean isGameRunning() {
+         return game.isGameRunning();
+     }
+ 
+-    public void updateGame(KeyStroke stroke) {
++    public void updateGame() {
+         if (stroke == null) {
+             return;
+         }
+@@ -37,23 +30,25 @@
+             case "t":
+                 break;
+             default:
+-                game.updateMaze(ch);
++                updateMaze(ch);
++        }
++    }
++
++    private void updateMaze(String ch) {
++        try {
++            game.updateMaze(ch);
++        } catch (ElementAlreadyExistsException e) {
++            System.out.println("Element Already Exists");
++        } catch (OutOfBoundsException e) {
++            throw new RuntimeException(e);
+         }
+     }
+ 
+-    public void updateScreen() throws IOException {
+-        screen.setCursorPosition(new TerminalPosition(0, 0));
+-        screen.clear();
+-        render();
+-        screen.refresh();
++    public void updateScreen() {
++
+     }
+ 
+     private void render() {
+-        if (inMenu) {
+-            drawMenu();
+-        } else {
+-            drawMaze();
+-        }
+     }
+ 
+     private void drawMenu() {
+Index: src/main/model/Game.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package model;\r\n\r\nimport model.exceptions.MazeAlreadyExistsException;\r\n\r\nimport java.util.Arrays;\r\nimport java.util.HashMap;\r\nimport java.util.HashSet;\r\nimport java.util.Map;\r\n\r\npublic class Game {\r\n    private boolean gameRunning;\r\n    private int playerVisibilty;\r\n    private final Map<String, Maze> mazeList;\r\n    private Maze currMaze;\r\n    private boolean editMode;\r\n    private static final String[] legalStrings = new String[] {};\r\n    private static final HashSet legalCharacters = new HashSet<>(Arrays.asList(legalStrings));\r\n\r\n    public Game() {\r\n        gameRunning = true;\r\n        playerVisibilty = 1;\r\n        mazeList = new HashMap();\r\n    }\r\n\r\n    public boolean isGameRunning() {\r\n        return gameRunning;\r\n    }\r\n\r\n    public void toggleMode() {\r\n        editMode = !editMode;\r\n    }\r\n\r\n    public void updateMaze(String key) {\r\n        editMode ? currMaze.moveCursor(key) : currMaze.movePlayer(dir);\r\n    }\r\n\r\n    private void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {\r\n        if (mazeList.get(name) != null) {\r\n            throw new MazeAlreadyExistsException();\r\n        } else {\r\n            mazeList.put(name, new Maze(name, gridSize));\r\n        }\r\n    }\r\n\r\n    private void selectMaze(String name) {\r\n        currMaze = mazeList.get(name);\r\n    }\r\n\r\n    private void deleteMaze(String name) {\r\n        mazeList.remove(name);\r\n    }\r\n\r\n}\r\n
+===================================================================
+diff --git a/src/main/model/Game.java b/src/main/model/Game.java
+--- a/src/main/model/Game.java	
++++ b/src/main/model/Game.java	
+@@ -1,24 +1,22 @@
+ package model;
+ 
++import model.exceptions.ElementAlreadyExistsException;
+ import model.exceptions.MazeAlreadyExistsException;
++import model.exceptions.OutOfBoundsException;
+ 
+-import java.util.Arrays;
+-import java.util.HashMap;
+-import java.util.HashSet;
+-import java.util.Map;
++import java.util.*;
+ 
+ public class Game {
+     private boolean gameRunning;
+-    private int playerVisibilty;
+     private final Map<String, Maze> mazeList;
+     private Maze currMaze;
+     private boolean editMode;
+-    private static final String[] legalStrings = new String[] {};
+-    private static final HashSet legalCharacters = new HashSet<>(Arrays.asList(legalStrings));
++
++    private static final String[] legalStrings = new String[] {"ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"};
++    private static final HashSet moveKeys = new HashSet<>(Arrays.asList(legalStrings));
+ 
+     public Game() {
+         gameRunning = true;
+-        playerVisibilty = 1;
+         mazeList = new HashMap();
+     }
+ 
+@@ -30,22 +28,32 @@
+         editMode = !editMode;
+     }
+ 
+-    public void updateMaze(String key) {
+-        editMode ? currMaze.moveCursor(key) : currMaze.movePlayer(dir);
++    public void updateMaze(String key) throws ElementAlreadyExistsException, OutOfBoundsException {
++        if (!editMode && moveKeys.contains(key)) {
++            currMaze.movePlayer(key);
++        } else if (moveKeys.contains(key)) {
++            currMaze.moveCursor(key);
++        } else {
++            currMaze.placeEntity(key);
++        }
+     }
+ 
+     private void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
+-        if (mazeList.get(name) != null) {
++        if (mazeList.containsKey(name)) {
+             throw new MazeAlreadyExistsException();
+         } else {
+             mazeList.put(name, new Maze(name, gridSize));
+         }
+     }
+ 
+-    private void selectMaze(String name) {
++    private void openMaze(String name) {
+         currMaze = mazeList.get(name);
+     }
+ 
++    private Set<String> getMazeList() {
++        return mazeList.keySet();
++    }
++
+     private void deleteMaze(String name) {
+         mazeList.remove(name);
+     }

@@ -12,7 +12,6 @@ public class ConsoleOutput {
         MAIN,
         OPEN,
         TOGGLE
-
     }
 
     public ConsoleOutput(Game game) {

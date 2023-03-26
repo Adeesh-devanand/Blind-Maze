@@ -2,6 +2,7 @@ package model;
 
 import model.exceptions.*;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import persistence.Writable;
 import ui.exceptions.MazeAlreadyExistsException;
@@ -10,11 +11,11 @@ import ui.exceptions.MazeDoesNotExistException;
 import java.util.*;
 
 public class Game implements Writable {
-    private boolean gameRunning;
     private final int playerVisibility;
     private final Map<String, Maze> mazeList;
-    private Maze currMaze;
+    private boolean gameRunning;
     private boolean editMode;
+    private Maze currMaze;
 
     public Game() {
         gameRunning = false;
@@ -27,26 +28,28 @@ public class Game implements Writable {
         try {
             JSONObject currMaze = gameJson.getJSONObject("currMaze");
             this.currMaze = new Maze(currMaze);
-        } catch (Exception e) {
-            //pass
+        } catch (JSONException e) {
+            // there is no currMaze
         }
 
-        JSONArray mazeList = gameJson.getJSONArray("mazeList");
-        this.mazeList = parseMazeList(mazeList);
+        this.mazeList = parseMazeList(gameJson.getJSONArray("mazeList"));
         gameRunning = gameJson.getBoolean("gameRunning");
         editMode = gameJson.getBoolean("editMode");
         playerVisibility = gameJson.getInt("playerVisibility");
     }
 
-    private Map<String, Maze> parseMazeList(JSONArray mazeList) {
-        Map<String, Maze> mazeMap = new HashMap<>();
-
-        for (Object json : mazeList) {
-            JSONObject mazeJson = (JSONObject) json;
-            Maze tempMaze = new Maze(mazeJson);
-            mazeMap.put(tempMaze.getName(), tempMaze);
+    public void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
+        if (mazeList.get(name) != null) {
+            throw new MazeAlreadyExistsException();
         }
-        return mazeMap;
+        mazeList.put(name, new Maze(name, gridSize));
+    }
+
+    public void selectMaze(String name) throws MazeDoesNotExistException {
+        if (mazeList.get(name) == null) {
+            throw new MazeDoesNotExistException();
+        }
+        currMaze = mazeList.get(name);
     }
 
     public void setRunning(boolean gameRunning) {
@@ -65,79 +68,58 @@ public class Game implements Writable {
         return editMode ? "EditMode" : "PlayMode";
     }
 
+    public boolean isEmpty() {
+        return mazeList.isEmpty();
+    }
+
+
+    //Requires: currMaze != null, gamerRunning
     public void updateMaze(String key) {
         if (key.equalsIgnoreCase("q")) {
             setRunning(false);
-            return;
-        }
-        if (editMode) {
-            updateEditMode(key);
+            currMaze = null;
+        } else if (editMode) {
+            assert currMaze != null;
+            assert gameRunning;
+            updateEditMode(key.toLowerCase());
         } else {
-            updatePlayMode(key);
+            assert currMaze != null;
+            assert gameRunning;
+            updatePlayMode(key.toLowerCase());
         }
     }
 
     private void updateEditMode(String key) {
         try {
-            switch (key.toLowerCase()) {
-                case "o":
-                    currMaze.placeEntity("Obstacle");
-                    break;
-                case "p":
-                    currMaze.placeEntity("Player");
-                    break;
-                case "m":
-                    currMaze.placeEntity("Monster");
+            switch (key) {
+                case "obstacle":
+                case "player":
+                case "monster":
+                    currMaze.placeEntity(key);
                     break;
                 case "l":
                 case "r":
                 case "u":
                 case "d":
                     currMaze.moveCursor(key);
-                    break;
             }
         } catch (ElementAlreadyExistsException e) {
             System.out.println("Can't place object here");
-        } catch (OutOfBoundsException e) {
-            throw new RuntimeException();
         }
     }
 
     private void updatePlayMode(String key) {
-        switch (key.toLowerCase()) {
-            case "l":
-            case "r":
-            case "u":
-            case "d":
-                currMaze.movePlayer(key);
-                break;
+        try {
+            switch (key) {
+                case "l":
+                case "r":
+                case "u":
+                case "d":
+                    currMaze.movePlayer(key);
+            }
+        } catch (ContactException e) {
+            System.out.println("Contact!!!");
         }
-    }
-
-    public void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
-        if (mazeList.get(name) != null) {
-            throw new MazeAlreadyExistsException();
-        } else {
-            mazeList.put(name, new Maze(name, gridSize));
-        }
-    }
-
-    public boolean isEmpty() {
-        return mazeList.isEmpty();
-    }
-
-    public void selectMaze(String name) throws MazeDoesNotExistException {
-        Maze tempMaze = mazeList.get(name);
-
-        if (tempMaze == null) {
-            throw new MazeDoesNotExistException();
-        }
-
-        currMaze = tempMaze;
-    }
-
-    public void deleteMaze(String name) {
-        mazeList.remove(name);
     }
 
     public String[][] getGrid() {
@@ -148,15 +130,13 @@ public class Game implements Writable {
         }
     }
 
-
-    //TODO: temp changed i and j, but drawGame() needs to be fixed
     private String[][] getEntireGrid() {
         int gridSize = currMaze.getGridSize();
         String[][] grid = new String[gridSize][gridSize];
-        for (int i = 0; i < gridSize; i++) {
-            for (int j = 0; j < gridSize; j++) {
+        for (int y = 0; y < gridSize; y++) {
+            for (int x = 0; x < gridSize; x++) {
                 try {
-                    grid[j][i] = currMaze.getStatus(i, j);
+                    grid[y][x] = currMaze.getStatus(new Position(x, y));
                 } catch (OutOfBoundsException e) {
                     throw new RuntimeException(e);
                 }
@@ -166,16 +146,18 @@ public class Game implements Writable {
     }
 
     private String[][] getPlayerGrid() {
-        String[][] grid = new String[2 * playerVisibility + 1][2 * playerVisibility + 1];
+        int gridSize = 2 * playerVisibility + 1;
+        String[][] grid = new String[gridSize][gridSize];
         Position playerPos = currMaze.getPlayerPosition();
-        int x = playerPos.getPosX();
-        int y = playerPos.getPosY();
-        for (int i = 0; i <= x + 2 * playerVisibility; i++) {
-            for (int j = 0; j <= y + 2 * playerVisibility; j++) {
+        int playerX = playerPos.getPosX();
+        int playerY = playerPos.getPosY();
+        for (int y = 0; y < gridSize; y++) {
+            for (int x = 0; x < gridSize; x++) {
                 try {
-                    grid[i][j] = currMaze.getStatus(i - playerVisibility, j - playerVisibility);
+                    grid[y][x] = currMaze.getStatus(new Position(x + playerX - playerVisibility,
+                            y + playerY - playerVisibility));
                 } catch (OutOfBoundsException e) {
-                    grid[i][j] = "~";
+                    grid[y][x] = "~";
                 }
             }
         }
@@ -184,25 +166,35 @@ public class Game implements Writable {
 
     @Override
     public JSONObject toJson() {
-        JSONObject json = new JSONObject();
-
-        json.put("gameRunning", gameRunning);
-        json.put("playerVisibility", playerVisibility);
-        json.put("mazeList", mazeListToJsonObject());
+        JSONObject jsonGame = new JSONObject();
+        jsonGame.put("playerVisibility", playerVisibility);
+        jsonGame.put("gameRunning", gameRunning);
+        jsonGame.put("editMode", editMode);
+        jsonGame.put("mazeList", mazeListToJsonObject());
         try {
-            json.put("currMaze", currMaze.toJson());
+            jsonGame.put("currMaze", currMaze.toJson());
         } catch (NullPointerException ignore) {
+            //No current maze
         }
-
-        json.put("editMode", editMode);
-        return json;
+        return jsonGame;
     }
 
     private JSONArray mazeListToJsonObject() {
         JSONArray json = new JSONArray();
-        for (Map.Entry<String, Maze> pairs : mazeList.entrySet()) {
-            json.put(pairs.getValue().toJson());
+        for (Maze tempMaze : mazeList.values()) {
+            json.put(tempMaze.toJson());
         }
         return json;
+    }
+
+    private Map<String, Maze> parseMazeList(JSONArray mazeList) {
+        Map<String, Maze> mazeMap = new HashMap<>();
+
+        for (Object json : mazeList) {
+            JSONObject mazeJson = (JSONObject) json;
+            Maze tempMaze = new Maze(mazeJson);
+            mazeMap.put(tempMaze.getName(), tempMaze);
+        }
+        return mazeMap;
     }
 }

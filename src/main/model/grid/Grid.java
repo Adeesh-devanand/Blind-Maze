@@ -139,17 +139,17 @@ public class Grid implements Writable {
         }
     }
 
-    public void moveMonster(String dir) throws ContactException {
-        Position newPos = moveInDirection(monster, dir);
-        if (newPos.equals(getPlayerPos())) {
-            throw new ContactException();
-        }
-        try {
-            setMonsterPosition(newPos);
-        } catch (OutOfBoundsException | ElementAlreadyExistsException ignored) {
-            //simply don't move
-        }
-    }
+//    public void moveMonster(String dir) throws ContactException {
+//        Position newPos = moveInDirection(monster, dir);
+//        if (newPos.equals(getPlayerPos())) {
+//            throw new ContactException();
+//        }
+//        try {
+//            setMonsterPosition(newPos);
+//        } catch (OutOfBoundsException | ElementAlreadyExistsException ignored) {
+//            //simply don't move
+//        }
+//    }
 
     public Position getCursorPos() {
         return cursor.getPosition();
@@ -200,7 +200,7 @@ public class Grid implements Writable {
         int newX = oldPos.getPosX();
         int newY = oldPos.getPosY();
 
-        switch (dir) {
+        switch (dir.toLowerCase()) {
             case "r":
                 newX++;
                 break;

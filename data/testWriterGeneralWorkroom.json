@@ -31,7 +31,8 @@
             },
             "cursorPos": "0 0"
         },
-        "name": "FirstMaze"
+        "name": "FirstMaze",
+        "id": 389323445
     }],
     "gameRunning": false,
     "editMode": true,

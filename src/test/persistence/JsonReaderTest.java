@@ -25,7 +25,7 @@ public class JsonReaderTest {
         JsonReader reader = new JsonReader("./data/testReaderNewGame.json");
         try {
             Game game = reader.loadGame();
-            assertEquals(false, game.isRunning());
+            assertFalse(game.isRunning());
             assertEquals("EditMode", game.getMode());
             assertThrows(MazeDoesNotExistException.class, () -> game.selectMaze(""));
         } catch (IOException e) {
@@ -38,9 +38,9 @@ public class JsonReaderTest {
         JsonReader reader = new JsonReader("./data/testReaderRunningGame.json");
         try {
             Game game = reader.loadGame();
-            assertEquals(true, game.isRunning());
+            assertTrue(game.isRunning());
             assertEquals("EditMode", game.getMode());
-           game.selectMaze("firstMaze");
+           game.selectMaze("TestMaze");
         } catch (MazeDoesNotExistException e) {
           fail();
         } catch (IOException e) {

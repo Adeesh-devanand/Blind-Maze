@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class Controller {
-    private static final String JSON_STORE = "./data/testReaderNewGame.json";
+    private static final String JSON_STORE = "./data/workspace.json";
     private Game game;
     private ConsoleOutput consoleOutput;
     private final Scanner scn;
