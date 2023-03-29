@@ -7,7 +7,7 @@ package model;
 
 import model.grid.Grid;
 import model.exceptions.ContactException;
-import model.exceptions.ElementAlreadyExistsException;
+import model.exceptions.PositionOccupiedException;
 import model.exceptions.OutOfBoundsException;
 import org.json.JSONObject;
 import persistence.Writable;
@@ -20,11 +20,6 @@ public class Maze implements Writable {
     private final Grid grid;
     private final int id;
 
-    //EFFECTS: Creates a blank Maze with a given name
-    public Maze(String name) {
-        this(name, 10);
-    }
-
     //EFFECTS: Creates a blank Maze with a given name and size
     public Maze(String name, int gridSize) {
         this.name = name;
@@ -34,12 +29,13 @@ public class Maze implements Writable {
 
     //EFFECTS: Creates a deep copy of the given Maze
     public Maze(Maze oldMaze) {
-        //you can access
         this.name = oldMaze.name;
         this.id = oldMaze.id;
         this.grid = new Grid(oldMaze.grid);
     }
 
+    //Requires: mazeJson must be a valid maze Json created using toJson()
+    //Effects: translates the JSONObject into a Maze
     public Maze(JSONObject mazeJson) {
         JSONObject gridJson = mazeJson.getJSONObject("grid");
         this.name = mazeJson.getString("name");
@@ -47,35 +43,41 @@ public class Maze implements Writable {
         this.grid = new Grid(gridJson);
     }
 
-    //MODIFIES: this
-    //EFFECTS: - moves player on the grid if it is a valid setPosition,
-    //         - returns whether the player made contact with the monster
+    //Modifies: this
+    //Effects: - moves the Player in the given direction if it's within bounds,
+    //           and if the new position is empty.
+    //         - throws ContactException on contact with Monster
     public void movePlayer(String dir) throws ContactException {
         grid.movePlayer(dir);
     }
 
+    //Modifies: this
+    //Effects: moves the Cursor in the given direction if it's within bounds
     public void moveCursor(String dir) {
         grid.moveCursor(dir);
     }
 
-    //MODIFIES: this
-    //EFFECTS: places an entity on the grid at cursor pos
-    public void placeEntity(String entity) throws ElementAlreadyExistsException {
+    //Modifies: this
+    //Effects: moves the Cursor to the given Position if it's within bounds
+    public void setCursorPos(Position pos) throws OutOfBoundsException {
+        grid.setCursorPosition(pos);
+    }
+
+    //Requires: the Position must be empty
+    //Modifies: this
+    //Effects: places an entity on the grid at cursor pos
+    public void placeEntity(String entity) throws PositionOccupiedException {
         Position p = grid.getCursorPos();
-        try {
-            switch (entity.toLowerCase()) {
-                case "player":
-                    grid.setPlayerPosition(p);
-                    break;
-                case "obstacle":
-                    grid.setObstacle(p);
-                    break;
-                case "monster":
-                    grid.setMonsterPosition(p);
-                    break;
-            }
-        } catch (OutOfBoundsException e) {
-            throw new RuntimeException("Cursor is possibly broken");
+        switch (entity.toLowerCase()) {
+            case "player":
+                grid.setPlayerPosition(p);
+                break;
+            case "obstacle":
+                grid.placeObstacle(p);
+                break;
+            case "monster":
+                grid.setMonsterPosition(p);
+                break;
         }
     }
 
@@ -84,7 +86,7 @@ public class Maze implements Writable {
         return name;
     }
 
-    //EFFECTS: returns gridSize
+    //EFFECTS: returns the size of the maze
     public int getGridSize() {
         return grid.getSize();
     }
@@ -94,14 +96,10 @@ public class Maze implements Writable {
         return grid.getPlayerPos();
     }
 
-    //EFFECTS: returns the entity at the position
-    //         empty, object, player, or monster
+    //Requires: the Position is within bounds
+    //EFFECTS:  returns the entity type at the given position
     public String getStatus(Position p) throws OutOfBoundsException {
         return grid.getStatus(p);
-    }
-
-    protected void setCursorPos(Position pos) throws OutOfBoundsException {
-        grid.setCursorPosition(pos);
     }
 
     @Override

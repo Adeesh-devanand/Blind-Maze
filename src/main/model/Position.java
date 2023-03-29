@@ -6,30 +6,33 @@
 
 package model;
 
-import org.json.JSONObject;
-import persistence.Writable;
-
 import java.util.Objects;
 
-public class Position implements Writable {
+public class Position {
     private final int posX;
     private final int posY;
 
+
+    //Effects: creates a Position with given co-ords
     public Position(int x, int y) {
         posX = x;
         posY = y;
     }
 
+    //Requires: str was created using Position.toString()
+    //Effects:  creates a Position with given co-ords
     public Position(String str) {
         String[] pos = str.split(" ");
         this.posX = Integer.parseInt(pos[0]);
         this.posY = Integer.parseInt(pos[1]);
     }
 
+    //Effects: returns the x co-ord
     public int getPosX() {
         return posX;
     }
 
+    //Effects: returns the y co-ord
     public int getPosY() {
         return posY;
     }
@@ -49,11 +52,6 @@ public class Position implements Writable {
     @Override
     public int hashCode() {
         return Objects.hash(posY, posX);
-    }
-
-    @Override
-    public JSONObject toJson() {
-        return null;
     }
 
     @Override

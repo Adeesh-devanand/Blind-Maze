@@ -35,6 +35,8 @@ public class JsonWriter {
         writer.print(json);
     }
 
+    //MODIFIES: this
+    //EFFECTS: saves the game to the destination file
     public void writeGame(Game game) {
         JSONObject json = game.toJson();
         saveToFile(json.toString(TAB));

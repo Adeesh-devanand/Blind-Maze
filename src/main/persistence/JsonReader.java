@@ -18,7 +18,7 @@ public class JsonReader {
     }
 
 
-    // EFFECTS: reads source file as string and returns it
+    // EFFECTS: reads source file as a string and returns it
     private String readFile(String source) throws IOException {
         StringBuilder contentBuilder = new StringBuilder();
 
@@ -29,6 +29,7 @@ public class JsonReader {
         return contentBuilder.toString();
     }
 
+    //Effects: reads the saved game from the source file and returns it
     public Game loadGame() throws IOException {
         String jsonData = readFile(source);
         JSONObject gameJson = new JSONObject(jsonData);

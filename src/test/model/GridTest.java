@@ -1,8 +1,8 @@
 package model;
 
+import model.exceptions.PositionOccupiedException;
 import model.grid.Grid;
 import model.exceptions.ContactException;
-import model.exceptions.ElementAlreadyExistsException;
 import model.exceptions.OutOfBoundsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ public class GridTest {
         assertEquals(p0_0, grid.getPlayerPos());
         assertEquals(p7_7, grid.getMonsterPos());
 
-        //getSizeTest()
+        // getSizeTest()
         assertEquals(8, grid.getSize());
 
         // getStatusTest()
@@ -97,8 +97,7 @@ public class GridTest {
     }
 
     @Test
-    public void setCursorPositionTest(){
-    }
+    public void setCursorPositionTest() {}
 
     @Test
     public void setPlayerPositionTest() {
@@ -110,7 +109,7 @@ public class GridTest {
             assertEquals(p4_5, grid.getPlayerPos());
             assertEquals("Empty", grid.getStatus(p0_0));
             assertEquals("Player", grid.getStatus(p4_5));
-        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+        } catch (OutOfBoundsException | PositionOccupiedException e) {
             fail("Unexpected exception thrown");
         }
 
@@ -118,7 +117,7 @@ public class GridTest {
             grid.setPlayerPosition(pneg1_1);
         } catch (OutOfBoundsException e) {
             //pass
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             fail("OutOfBoundsException should have been thrown first");
         }
 
@@ -126,7 +125,7 @@ public class GridTest {
             grid.setPlayerPosition(p7_7);
         } catch (OutOfBoundsException e) {
             fail("Within bounds but OutOfBoundsException still thrown");
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             //pass
         }
     }
@@ -141,7 +140,7 @@ public class GridTest {
             assertEquals(p3_2, grid.getMonsterPos());
             assertEquals("Empty", grid.getStatus(p7_7));
             assertEquals("Monster", grid.getStatus(p3_2));
-        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+        } catch (OutOfBoundsException | PositionOccupiedException e) {
             fail("Unexpected exception thrown");
         }
 
@@ -149,7 +148,7 @@ public class GridTest {
             grid.setMonsterPosition(p8_7);
         } catch (OutOfBoundsException e) {
             //pass
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             fail("OutOfBoundsException should have been thrown first");
         }
 
@@ -157,7 +156,7 @@ public class GridTest {
             grid.setPlayerPosition(p7_7);
         } catch (OutOfBoundsException e) {
             fail("Within bounds but OutOfBoundsException still thrown");
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             //pass
         }
     }
@@ -166,27 +165,27 @@ public class GridTest {
     public void setObstacleTest() {
         try {
             assertEquals("Empty", grid.getStatus(p0_1));
-            grid.setObstacle(p0_1);
+            grid.placeObstacle(p0_1);
             assertEquals("Obstacle", grid.getStatus(p0_1));
-        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+        } catch (OutOfBoundsException | PositionOccupiedException e) {
             fail("Unexpected Exception thrown");
         }
 
         try {
-            grid.setObstacle(pneg1_1);
+            grid.placeObstacle(pneg1_1);
             fail("OutOfBoundsException should have been thrown");
         } catch (OutOfBoundsException e) {
             //pass
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             fail("OutOfBoundsException should have been thrown first");
         }
 
         try {
-            grid.setObstacle(p0_1);
-            fail("ElementAlreadyExistsException should have been thrown");
+            grid.placeObstacle(p0_1);
+            fail("PositionOccupiedException should have been thrown");
         } catch (OutOfBoundsException e) {
-            fail("ElementAlreadyExistsException should have been thrown");
-        } catch (ElementAlreadyExistsException e) {
+            fail("PositionOccupiedException should have been thrown");
+        } catch (PositionOccupiedException e) {
             //pass
         }
     }
@@ -198,14 +197,20 @@ public class GridTest {
     public void movePlayerTest() {}
 
     @Test
-    public void moveMonsterTest() {}
+    public void moveMonsterTest() {
+        try {
+            grid.moveMonster("d");
+        } catch (ContactException e) {
+            // contact with Player
+        }
+    }
 
     @Test
     public void contactTest() {
         try {
             grid.setMonsterPosition(p0_1);
             assertThrows(ContactException.class, () -> grid.movePlayer("d"));
-        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+        } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail();
         }
     }
@@ -240,7 +245,7 @@ public class GridTest {
 //            grid.movePlayer("d");
 //            assertEquals("Player", grid.getStatus(p5_7));
 //
-//            grid.setObstacle(p7_7);
+//            grid.placeObstacle(p7_7);
 //            assertEquals("Obstacle", grid.getStatus(p7_7));
 //            assertEquals("Monster", grid.getStatus(p7_6));
 //
@@ -255,7 +260,7 @@ public class GridTest {
 //            }
 //            assertEquals("Monster", grid.getStatus(p7_6));
 //            assertEquals("Obstacle", grid.getStatus(p7_7));
-//        } catch (OutOfBoundsException | ElementAlreadyExistsException | ContactException e) {
+//        } catch (OutOfBoundsException | PositionOccupiedException | ContactException e) {
 //            fail();
 //        }
 //    }

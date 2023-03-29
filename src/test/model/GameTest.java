@@ -33,18 +33,23 @@ public class GameTest {
 
     @Test
     public void runningTest() {
+        try {
+            game.createMaze("MyFirstMaze");
 
-        game.setRunning(false);
-        assertFalse(game.isRunning());
+            game.quitGame();
+            assertFalse(game.isRunning());
 
-        game.setRunning(true);
-        assertTrue(game.isRunning());
+            game.selectMaze("MyFirstMaze");
+            assertTrue(game.isRunning());
 
-        game.setRunning(true);
-        assertTrue(game.isRunning());
+            game.selectMaze("MyFirstMaze");
+            assertTrue(game.isRunning());
 
-        game.setRunning(false);
-        assertFalse(game.isRunning());
+            game.quitGame();
+            assertFalse(game.isRunning());
+        } catch (MazeAlreadyExistsException | MazeDoesNotExistException e) {
+            fail("Unexpected Exception thrown");
+        }
     }
 
     @Test
@@ -52,7 +57,7 @@ public class GameTest {
         try {
             assertTrue(game.isEmpty());
 
-            game.createMaze("MyFirstMaze", 10);
+            game.createMaze("MyFirstMaze");
             assertFalse(game.isEmpty());
 
             game.createMaze("MySecondMaze", 3);
@@ -144,12 +149,10 @@ public class GameTest {
         game.toggleMode();
         assertEquals("PlayMode", game.getMode());
         game.getGrid();
-
     }
 
     private void openNewMaze() {
         try {
-            game.setRunning(true);
             game.createMaze("MyFirstMaze", 2);
             game.selectMaze("MyFirstMaze");
         } catch (MazeAlreadyExistsException | MazeDoesNotExistException e) {

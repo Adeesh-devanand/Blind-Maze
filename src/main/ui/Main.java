@@ -8,10 +8,9 @@
 
 package ui;
 
-import java.io.IOException;
-
+//TODO: Saving and loading game adds new player in Position(0,0)
 public class Main {
-    public static void main(String[] args) throws Exception {
-        new ConsoleInterface();
+    public static void main(String[] args) {
+        new GuiInterface();
     }
 }

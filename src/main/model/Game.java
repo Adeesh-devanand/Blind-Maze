@@ -11,19 +11,22 @@ import ui.exceptions.MazeDoesNotExistException;
 import java.util.*;
 
 public class Game implements Writable {
-    private final int playerVisibility;
+    private final int defaultGridSize = 10;
+    private int playerVisibility = 1;
     private final Map<String, Maze> mazeList;
     private boolean gameRunning;
     private boolean editMode;
     private Maze currMaze;
 
+    //Effects: creates a Game that is not running, and in editMode by default
     public Game() {
         gameRunning = false;
         editMode = true;
-        playerVisibility = 2;
         mazeList = new HashMap<>();
     }
 
+    //Requires: gameJson must be a valid Json object created using toJson()
+    //Effects:  translates a Game object from a Json object
     public Game(JSONObject gameJson) {
         try {
             JSONObject currMaze = gameJson.getJSONObject("currMaze");
@@ -38,6 +41,14 @@ public class Game implements Writable {
         playerVisibility = gameJson.getInt("playerVisibility");
     }
 
+    //Modifies: this
+    //Effects: creates an empty maze and adds it to the list of available mazes
+    public void createMaze(String name) throws MazeAlreadyExistsException {
+        createMaze(name, defaultGridSize);
+    }
+
+    //Modifies: this
+    //Effects: creates an empty maze and adds it to the list of available mazes
     public void createMaze(String name, int gridSize) throws MazeAlreadyExistsException {
         if (mazeList.get(name) != null) {
             throw new MazeAlreadyExistsException();
@@ -45,50 +56,63 @@ public class Game implements Writable {
         mazeList.put(name, new Maze(name, gridSize));
     }
 
+    //Requires: there must be at least one maze created
+    //Modifies: this
+    //Effects:  - sets the active maze to the given maze,
+    //          - and sets the game to running
     public void selectMaze(String name) throws MazeDoesNotExistException {
         if (mazeList.get(name) == null) {
             throw new MazeDoesNotExistException();
         }
         currMaze = mazeList.get(name);
+        gameRunning = true;
     }
 
-    public void setRunning(boolean gameRunning) {
-        this.gameRunning = gameRunning;
+    //Modifies: this
+    //Effects:  sets the game to not running
+    public void quitGame() {
+        this.gameRunning = false;
     }
 
+    //Effects: returns if the game is running
     public boolean isRunning() {
         return gameRunning;
     }
 
+    //Modifies: this
+    //Effects: toggles between editMode and playMode
     public void toggleMode() {
         editMode = !editMode;
     }
 
+    //Effects: returns the game mode currently set
     public String getMode()     {
         return editMode ? "EditMode" : "PlayMode";
     }
 
+    //Effects: returns true if there are no mazes created
     public boolean isEmpty() {
         return mazeList.isEmpty();
     }
 
-
-    //Requires: currMaze != null, gamerRunning
+    //Requires: requires a maze to be selected, and the game to be running
+    //Modifies: this, currMaze
+    //Effects:  - updates the active maze based on the user input, and the current game mode
+    //          - quits the game, and deactivates active maze if user quits
     public void updateMaze(String key) {
         if (key.equalsIgnoreCase("q")) {
-            setRunning(false);
+            quitGame();
             currMaze = null;
         } else if (editMode) {
-            assert currMaze != null;
-            assert gameRunning;
             updateEditMode(key.toLowerCase());
         } else {
-            assert currMaze != null;
-            assert gameRunning;
             updatePlayMode(key.toLowerCase());
         }
     }
 
+    //Requires: requires a maze to be selected
+    //Modifies: this, currMaze
+    //Effects:  updates the active maze in EDIT mode
     private void updateEditMode(String key) {
         try {
             switch (key) {
@@ -103,11 +127,14 @@ public class Game implements Writable {
                 case "d":
                     currMaze.moveCursor(key);
             }
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             System.out.println("Can't place object here");
         }
     }
 
+    //Requires: requires a maze to be selected
+    //Modifies: this, currMaze
+    //Effects:  updates the active maze in PLAY mode
     private void updatePlayMode(String key) {
         try {
             switch (key) {
@@ -122,6 +149,8 @@ public class Game implements Writable {
         }
     }
 
+    //Requires: requires a maze to be selected
+    //Effects:  gets the active grid based on the current game mode
     public String[][] getGrid() {
         if (editMode) {
             return getEntireGrid();
@@ -130,21 +159,21 @@ public class Game implements Writable {
         }
     }
 
+    //Requires: requires a maze to be selected
+    //Effects:  gets the entire active grid
     private String[][] getEntireGrid() {
         int gridSize = currMaze.getGridSize();
         String[][] grid = new String[gridSize][gridSize];
         for (int y = 0; y < gridSize; y++) {
             for (int x = 0; x < gridSize; x++) {
-                try {
-                    grid[y][x] = currMaze.getStatus(new Position(x, y));
-                } catch (OutOfBoundsException e) {
-                    throw new RuntimeException(e);
-                }
+                grid[y][x] = currMaze.getStatus(new Position(x, y));
             }
         }
         return grid;
     }
 
+    //Requires: requires a maze to be selected
+    //Effects:  gets the active grid with only the given visibility around the player
     private String[][] getPlayerGrid() {
         int gridSize = 2 * playerVisibility + 1;
         String[][] grid = new String[gridSize][gridSize];
@@ -157,7 +186,7 @@ public class Game implements Writable {
                     grid[y][x] = currMaze.getStatus(new Position(x + playerX - playerVisibility,
                             y + playerY - playerVisibility));
                 } catch (OutOfBoundsException e) {
-                    grid[y][x] = "~";
+                    grid[y][x] = "Void";
                 }
             }
         }

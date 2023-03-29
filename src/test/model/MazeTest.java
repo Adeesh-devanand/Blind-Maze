@@ -1,7 +1,7 @@
 package model;
 
 import model.exceptions.ContactException;
-import model.exceptions.ElementAlreadyExistsException;
+import model.exceptions.PositionOccupiedException;
 import model.exceptions.OutOfBoundsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ public class MazeTest {
 
     @BeforeEach
     public void setup() {
-        m1 = new Maze("MyFirstMaze");
+        m1 = new Maze("MyFirstMaze", 10);
         m2 = new Maze("SmallerMaze", 3);
     }
 
@@ -26,14 +26,14 @@ public class MazeTest {
             m1.placeEntity("Player");
             m1.setCursorPos(new Position(1, 5));
             m1.placeEntity("Obstacle");
-        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+        } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail("Unexpected Error thrown");
         }
 
         m3 = new Maze(m1);//deep copy of maze1
 
         assertNotEquals(null, m3);
-        assertNotEquals(m3, new Maze("MyFirstMaze"));
+        assertNotEquals(m3, new Maze("MyFirstMaze", 10));
         assertEquals(m3, m3);
         assertEquals(m3, m1);
 
@@ -47,7 +47,7 @@ public class MazeTest {
 
             assertEquals("Obstacle", m1.getStatus(new Position(0, 1)));
             assertEquals("Empty", m3.getStatus(new Position(0, 1)));
-        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+        } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail("Unexpected Error thrown");
         }
     }
@@ -92,7 +92,7 @@ public class MazeTest {
             m1.placeEntity("Monster");
             assertEquals("Monster", m1.getStatus(new Position(9, 8)));
             //pass
-        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+        } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail("Unexpected error thrown");
         }
 
@@ -112,7 +112,7 @@ public class MazeTest {
             m1.moveCursor("r");
             m1.placeEntity("Obstacle");
             assertEquals("Obstacle", m1.getStatus(new Position(9, 7)));
-        } catch (ElementAlreadyExistsException | OutOfBoundsException e) {
+        } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail("Unexpected error thrown");
         }
     }
@@ -164,14 +164,14 @@ public class MazeTest {
             assertEquals("Empty", m2.getStatus(new Position(0, 0)));
             assertEquals("Player", m2.getStatus(new Position(1, 0)));
 
-        } catch (OutOfBoundsException | ElementAlreadyExistsException e) {
+        } catch (OutOfBoundsException | PositionOccupiedException e) {
             fail("Unexpected Exception thrown");
         }
 
         try {
             m2.placeEntity("Monster");
             fail("Exception was expected to be thrown");
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             //pass
         }
 
@@ -179,7 +179,7 @@ public class MazeTest {
             m2.setCursorPos(new Position(2, 2));
             m2.placeEntity("Monster");
             fail("Exception was expected to be thrown");
-        } catch (ElementAlreadyExistsException e) {
+        } catch (PositionOccupiedException e) {
             //pass
         } catch (OutOfBoundsException e) {
             fail("Wrong exception was thrown");
