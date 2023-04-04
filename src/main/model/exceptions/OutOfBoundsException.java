@@ -1,4 +1,4 @@
 package model.exceptions;
 
-public class OutOfBoundsException extends RuntimeException {
+public class OutOfBoundsException extends Exception {
 }

@@ -5,7 +5,7 @@
             "internalGrid": {
                 "0 0": "Player",
                 "1 0": "Empty",
-                "0 1": "Empty",
+                "0 1": "Obstacle",
                 "2 0": "Empty",
                 "1 1": "Empty",
                 "0 2": "Empty",
@@ -76,7 +76,7 @@
                 "internalGrid": {
                     "0 0": "Player",
                     "1 0": "Empty",
-                    "0 1": "Empty",
+                    "0 1": "Obstacle",
                     "2 0": "Empty",
                     "1 1": "Empty",
                     "0 2": "Empty",

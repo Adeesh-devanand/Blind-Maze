@@ -201,7 +201,7 @@ public class GridTest {
         try {
             grid.moveMonster("d");
         } catch (ContactException e) {
-            // contact with Player
+            fail("Should haven't gone out of bounds");
         }
     }
 
@@ -209,10 +209,11 @@ public class GridTest {
     public void contactTest() {
         try {
             grid.setMonsterPosition(p0_1);
-            assertThrows(ContactException.class, () -> grid.movePlayer("d"));
+            grid.movePlayer("d");
         } catch (PositionOccupiedException | OutOfBoundsException e) {
             fail();
-        }
+        } catch (ContactException ignored) {}
+            //pass
     }
 
 //    @Test

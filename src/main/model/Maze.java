@@ -68,16 +68,20 @@ public class Maze implements Writable {
     //Effects: places an entity on the grid at cursor pos
     public void placeEntity(String entity) throws PositionOccupiedException {
         Position p = grid.getCursorPos();
-        switch (entity.toLowerCase()) {
-            case "player":
-                grid.setPlayerPosition(p);
-                break;
-            case "obstacle":
-                grid.placeObstacle(p);
-                break;
-            case "monster":
-                grid.setMonsterPosition(p);
-                break;
+        try {
+            switch (entity.toLowerCase()) {
+                case "player":
+                    grid.setPlayerPosition(p);
+                    break;
+                case "obstacle":
+                    grid.placeObstacle(p);
+                    break;
+                case "monster":
+                    grid.setMonsterPosition(p);
+                    break;
+            }
+        } catch (OutOfBoundsException e) {
+            throw new RuntimeException(e);
         }
     }
 

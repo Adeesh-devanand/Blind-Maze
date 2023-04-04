@@ -166,7 +166,11 @@ public class Game implements Writable {
         String[][] grid = new String[gridSize][gridSize];
         for (int y = 0; y < gridSize; y++) {
             for (int x = 0; x < gridSize; x++) {
-                grid[y][x] = currMaze.getStatus(new Position(x, y));
+                try {
+                    grid[y][x] = currMaze.getStatus(new Position(x, y));
+                } catch (OutOfBoundsException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return grid;

@@ -2,10 +2,10 @@ package model.grid;
 
 import model.Position;
 
-public class Player extends Element {
+public class Player extends MovableElement {
 
-    public Player(Position position) {
-        super(position, "Player");
+    public Player(Position position, Grid grid) {
+        super(position, "Player", grid);
     }
 
     public Player(Player player) {
