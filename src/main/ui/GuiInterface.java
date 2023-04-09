@@ -1,6 +1,8 @@
 package ui;
 
 import model.Game;
+import model.logging.Event;
+import model.logging.EventLog;
 import persistence.JsonReader;
 import persistence.JsonWriter;
 import ui.exceptions.MazeAlreadyExistsException;
@@ -11,6 +13,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class GuiInterface extends JFrame implements ActionListener {
     private Game game;
@@ -115,10 +118,19 @@ public class GuiInterface extends JFrame implements ActionListener {
                 defaultOption);
 
         if (choice == JOptionPane.YES_OPTION) {
+            printLogs();
             save();
             System.exit(1);
         } else if (choice == JOptionPane.NO_OPTION) {
+            printLogs();
             System.exit(0);
+        }
+    }
+
+    private void printLogs() {
+        EventLog eventLog = EventLog.getInstance();
+        for (Event e : eventLog) {
+            System.out.println(e.getDate() + "||" + e.getDescription());
         }
     }
 

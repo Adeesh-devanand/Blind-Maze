@@ -30,9 +30,7 @@ public abstract class MovableElement extends Element {
 
     public void move(String dir) throws ContactException {
         Position newPos = grid.getNewPosition(this, dir);
-        if (grid.checkContact(this, newPos)) {
-            throw new ContactException();
-        }
+        grid.checkContact(this, newPos);
         try {
             setPosition(newPos);
         } catch (OutOfBoundsException | PositionOccupiedException ignored) {

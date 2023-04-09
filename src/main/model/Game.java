@@ -1,6 +1,8 @@
 package model;
 
 import model.exceptions.*;
+import model.logging.Event;
+import model.logging.EventLog;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,6 +16,7 @@ public class Game implements Writable {
     private final int defaultGridSize = 10;
     private int playerVisibility = 1;
     private final Map<String, Maze> mazeList;
+    private final EventLog eventLog = EventLog.getInstance();
     private boolean gameRunning;
     private boolean editMode;
     private Maze currMaze;
@@ -45,6 +48,7 @@ public class Game implements Writable {
     //Effects: creates an empty maze and adds it to the list of available mazes
     public void createMaze(String name) throws MazeAlreadyExistsException {
         createMaze(name, defaultGridSize);
+        eventLog.logEvent(new Event("Created maze: " + '"' + name + '"'));
     }
 
     //Modifies: this
@@ -65,6 +69,7 @@ public class Game implements Writable {
             throw new MazeDoesNotExistException();
         }
         currMaze = mazeList.get(name);
+        eventLog.logEvent(new Event("Opened maze: " + '"' + name + '"'));
         gameRunning = true;
     }
 
@@ -72,6 +77,7 @@ public class Game implements Writable {
     //Effects:  sets the game to not running
     public void quitGame() {
         this.gameRunning = false;
+        eventLog.logEvent(new Event("Quit current maze"));
     }
 
     //Effects: returns if the game is running
@@ -83,6 +89,7 @@ public class Game implements Writable {
     //Effects: toggles between editMode and playMode
     public void toggleMode() {
         editMode = !editMode;
+        eventLog.logEvent(new Event("Toggled to: " + getMode()));
     }
 
     //Effects: returns the game mode currently set
