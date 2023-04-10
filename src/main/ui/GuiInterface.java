@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 
 public class GuiInterface extends JFrame implements ActionListener {
     private Game game;
@@ -130,7 +129,7 @@ public class GuiInterface extends JFrame implements ActionListener {
     private void printLogs() {
         EventLog eventLog = EventLog.getInstance();
         for (Event e : eventLog) {
-            System.out.println(e.getDate() + "||" + e.getDescription());
+            System.out.println(e.getDate() + "|  " + e.getDescription());
         }
     }
 
