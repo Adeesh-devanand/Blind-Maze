@@ -37,6 +37,29 @@ public class Position {
         return posY;
     }
 
+
+    //Effects: - returns the new position in the given direction
+    //         - the Position doesn't need to be withing the grid
+    public static Position getNewPosition(Position oldPos, String dir) {
+        int newX = oldPos.getPosX();
+        int newY = oldPos.getPosY();
+
+        switch (dir.toLowerCase()) {
+            case "r":
+                newX++;
+                break;
+            case "l":
+                newX--;
+                break;
+            case "u":
+                newY--;
+                break;
+            case "d":
+                newY++;
+        }
+        return new Position(newX, newY);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -32,7 +32,7 @@
             "cursorPos": "0 0"
         },
         "name": "FirstMaze",
-        "id": -1801765363
+        "id": -139209787
     },
     "mazeList": [{
         "grid": {
@@ -67,7 +67,7 @@
             "cursorPos": "0 0"
         },
         "name": "FirstMaze",
-        "id": -1801765363
+        "id": -139209787
     }],
     "gameRunning": true,
     "editMode": true,

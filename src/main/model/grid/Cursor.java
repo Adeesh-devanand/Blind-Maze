@@ -14,16 +14,17 @@ public class Cursor extends MovableElement {
     }
 
     @Override
-    public void setPosition(Position p) throws OutOfBoundsException {
-        grid.checkBounds(p);
+    public void setPosition(Position p) {
         this.position = p;
     }
 
     @Override
     public void move(String dir) {
-        Position newPos = grid.getNewPosition(this, dir);
         try {
+            Position newPos = Position.getNewPosition(getPosition(), dir);
+            grid.checkBounds(newPos);
             setPosition(newPos);
+            logMovement(dir);
         } catch (OutOfBoundsException ignored) {
             //simply don't move
         }

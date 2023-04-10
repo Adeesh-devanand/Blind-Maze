@@ -21,7 +21,6 @@ import java.util.Set;
 public class Grid implements Writable {
     private final int gridSize;
     private final Map<Position, Element> grid;
-    private final EventLog eventLog = EventLog.getInstance();
     private Cursor cursor;
     private Player player;
     private Monster monster;
@@ -37,12 +36,15 @@ public class Grid implements Writable {
             }
         }
 
-        player = new Player(new Position(0, 0), this);
-        monster = new Monster(new Position(gridSize - 1, gridSize - 1), this);
-        cursor = new Cursor(new Position(0, 0), this);
+        Position firstCell = new Position(0, 0);
+        Position lastCell = new Position(gridSize - 1, gridSize - 1);
 
-        replace(player.getPosition(), player);
-        replace(monster.getPosition(), monster);
+        player = new Player(firstCell, this);
+        monster = new Monster(lastCell, this);
+        cursor = new Cursor(firstCell, this);
+
+        grid.replace(lastCell, monster);
+        grid.replace(firstCell, player);
     }
 
     // Effects: creates a deep copy of the grid
@@ -58,25 +60,16 @@ public class Grid implements Writable {
             }
         }
 
+        Position firstCell = new Position(0, 0);
+        Position lastCell = new Position(gridSize - 1, gridSize - 1);
+
         player = new Player(oldGrid.player);
         monster = new Monster(oldGrid.monster);
         cursor = new Cursor(oldGrid.cursor);
 
-        try {
-            player.setPosition(player.getPosition());
-        } catch (PositionOccupiedException ignore) {
-            // Player is in the same position
-        } catch (OutOfBoundsException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            monster.setPosition(monster.getPosition());
-        } catch (PositionOccupiedException e) {
-            // Monster is in the same position
-        } catch (OutOfBoundsException e) {
-            throw new RuntimeException(e);
-        }
+        //TODO: will delete obstacles in first and last cells
+        swap(firstCell, player.getPosition());
+        swap(lastCell, monster.getPosition());
     }
 
     //Requires: gridJson must be a valid grid Json created using toJson()
@@ -94,17 +87,15 @@ public class Grid implements Writable {
             Position position = new Position(key);
             switch (type) {
                 case "Obstacle":
-                    replace(position, new Obstacle());
+                    grid.replace(position, new Obstacle());
                     break;
                 case "Player":
-                    Player player = new Player(position, this);
-                    replace(position, player);
-                    this.player = player;
+                    this.player = new Player(position, this);
+                    grid.replace(position, player);
                     break;
                 case "Monster":
-                    Monster monster = new Monster(position, this);
-                    replace(position, monster);
-                    this.monster = monster;
+                    this.monster = new Monster(position, this);
+                    grid.replace(position, monster);
             }
 
         }
@@ -114,39 +105,47 @@ public class Grid implements Writable {
     //Modifies: this
     //Effects: changes the position of the cursor
     public void setCursorPosition(Position p) throws OutOfBoundsException {
+        checkBounds(p);
         cursor.setPosition(p);
-        eventLog.logEvent(new Event("Placed cursor at: " + p));
+        log("Placed cursor at: " + p);
     }
 
     //Requires: Position p is within the bounds of the grid, and should be empty
     //Modifies: this
-    //Effects:  changes the position of the player
+    //Effects:  swaps the position of the player
     public void setPlayerPosition(Position p) throws PositionOccupiedException, OutOfBoundsException {
+        checkBounds(p);
+        checkEmpty(p);
+        swap(p, player.getPosition());
         player.setPosition(p);
-        eventLog.logEvent(new Event("Placed player at: " + p));
+        log("Placed player at: " + p);
     }
 
     //Requires: Position p is within the bounds of the grid, and should be empty
     //Modifies: this
-    //Effects:  changes the position of the monster
+    //Effects:  swaps the position of the monster
     public void setMonsterPosition(Position p) throws PositionOccupiedException, OutOfBoundsException {
+        checkBounds(p);
+        checkEmpty(p);
+        swap(p, monster.getPosition());
         monster.setPosition(p);
-        eventLog.logEvent(new Event("Placed monster at: " + p));
+        log("Placed monster at: " + p);
     }
 
     //Requires: Position p is within the bounds of the grid, and should be empty
     //Modifies: this
     //Effects: places an Obstacle at the given Position
     public void placeObstacle(Position p) throws PositionOccupiedException, OutOfBoundsException {
-        placeOnGrid(p, new Obstacle());
-        eventLog.logEvent(new Event("Placed obstacle at: " + p));
+        checkBounds(p);
+        checkEmpty(p);
+        grid.replace(p, new Obstacle());
+        log("Placed obstacle at: " + p);
     }
 
     //Modifies: this
     //Effects: moves the Cursor in the given direction if it's within bounds
     public void moveCursor(String dir) {
         cursor.move(dir);
-        eventLog.logEvent(new Event("Cursor tried to move: " + dir));
     }
 
     //Modifies: this
@@ -155,7 +154,6 @@ public class Grid implements Writable {
     //         - throws ContactException on contact with Monster
     public void movePlayer(String dir) throws ContactException {
         player.move(dir);
-        eventLog.logEvent(new Event("Player tried to move: " + dir));
     }
 
     //TODO: finish tests for Grid
@@ -165,7 +163,6 @@ public class Grid implements Writable {
     //         - throws ContactException on contact with Player
     public void moveMonster(String dir) throws ContactException {
         monster.move(dir);
-        eventLog.logEvent(new Event("Monster tried to move: " + dir));
     }
 
     //Effects: returns the Cursor Position on the grid
@@ -194,32 +191,24 @@ public class Grid implements Writable {
         return gridSize;
     }
 
-    //Requires: the Position is within bounds and empty
-    //Modifies: this
-    //Effects:  places the given Element at the given Position
-    void placeOnGrid(Position p, Element e) throws OutOfBoundsException, PositionOccupiedException {
-        checkEmpty(p);
-        replace(p, e);
+    //Effects: swaps the elements at the two positions
+    void swap(Position p1, Position p2) {
+        Element val1 = grid.get(p1);
+        Element val2 = grid.get(p2);
+        grid.replace(p1, val2);
+        grid.replace(p2, val1);
     }
 
-    void replace(Position p, Element e) {
-        grid.replace(p, e);
-    }
-
-    void checkContact(MovableElement currElement, Position newPos) throws ContactException {
-        boolean contact = player.getPosition().equals(newPos);
-        if (currElement instanceof Player) {
-            contact =  monster.getPosition().equals(newPos);
-        }
-        if (contact) {
+    //Effects: throws a contact exception if the newPos has a MovableElement
+    void checkContact(Position newPos) throws ContactException {
+        if (grid.get(newPos) instanceof MovableElement) {
             throw new ContactException();
         }
     }
 
     //Requires: the Position should be within bounds
     //Effects:  throws error if the Position is occupied
-    void checkEmpty(Position p) throws OutOfBoundsException, PositionOccupiedException {
-        checkBounds(p);
+    void checkEmpty(Position p) throws PositionOccupiedException {
         Element e = grid.get(p);
         if (!"Empty".equals(e.getType())) {
             throw new PositionOccupiedException();
@@ -235,29 +224,6 @@ public class Grid implements Writable {
         }
     }
 
-    //Effects: - returns the Position of the movable Element in the given direction
-    //         - the Position doesn't need to be withing the grid
-    Position getNewPosition(MovableElement movableObj, String dir) {
-        Position oldPos = movableObj.getPosition();
-        int newX = oldPos.getPosX();
-        int newY = oldPos.getPosY();
-
-        switch (dir.toLowerCase()) {
-            case "r":
-                newX++;
-                break;
-            case "l":
-                newX--;
-                break;
-            case "u":
-                newY--;
-                break;
-            case "d":
-                newY++;
-        }
-        return new Position(newX, newY);
-    }
-
     @Override
     public JSONObject toJson() {
         JSONObject json = new JSONObject();
@@ -271,5 +237,11 @@ public class Grid implements Writable {
         }
         json.put("internalGrid", jsonGrid);
         return json;
+    }
+
+    //Effects: logs the event with description x
+    private void log(String x) {
+        EventLog eventLog = EventLog.getInstance();
+        eventLog.logEvent(new Event(x));
     }
 }
