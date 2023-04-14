@@ -1,3 +1,6 @@
+/*
+ * Handles functionality for lading the game which is saved in the Json format  */
+
 package persistence;
 
 import model.Game;

@@ -1,3 +1,6 @@
+/*
+ * The GUI interface for the application */
+
 package ui;
 
 import model.Game;
@@ -126,6 +129,7 @@ public class GuiInterface extends JFrame implements ActionListener {
         }
     }
 
+    //Effects: prints the system logs
     private void printLogs() {
         EventLog eventLog = EventLog.getInstance();
         for (Event e : eventLog) {

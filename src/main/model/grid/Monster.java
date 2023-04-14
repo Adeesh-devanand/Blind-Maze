@@ -1,3 +1,6 @@
+/*
+ * Represents a Monster on the grid */
+
 package model.grid;
 
 import model.Position;

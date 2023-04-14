@@ -1,3 +1,6 @@
+/*
+ * Represents the cursor which can be moved around in EditMode */
+
 package model.grid;
 
 import model.Position;

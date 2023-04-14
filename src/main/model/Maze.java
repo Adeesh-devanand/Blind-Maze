@@ -1,7 +1,6 @@
 /*
- * A typical controller, handles all interaction between UI, and the model
- * the UI is only dependent on this class in the model package, all instructions
- * to the model are fed through this class */
+ * A typical Wrapper class for Grid, handles all interaction between Game and Grid.
+ * Provides only the functionality of grid which is needed by Game. */
 
 package model;
 

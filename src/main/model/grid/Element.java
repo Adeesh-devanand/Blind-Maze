@@ -1,3 +1,6 @@
+/*
+ * Represents an Element on the grid */
+
 package model.grid;
 
 public abstract class Element {
@@ -13,11 +16,10 @@ public abstract class Element {
         this.icon = e.icon;
     }
 
+    //Effects: returns the type of the Element
     public String getType() {
         return type;
     }
-
-
 
     @Override
     public String toString() {

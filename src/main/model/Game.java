@@ -1,3 +1,7 @@
+/*
+ * Represents the entire Game, which holds the collection of Mazes.
+ * Acts as the sole point of interaction between the Model and UI package */
+
 package model;
 
 import model.exceptions.*;
@@ -219,6 +223,7 @@ public class Game implements Writable {
         return jsonGame;
     }
 
+    //Effects: converts the Game's mazeList into a JSONArray
     private JSONArray mazeListToJsonObject() {
         JSONArray json = new JSONArray();
         for (Maze tempMaze : mazeList.values()) {
@@ -227,10 +232,12 @@ public class Game implements Writable {
         return json;
     }
 
-    private Map<String, Maze> parseMazeList(JSONArray mazeList) {
+    //Modifies: mazeListJson
+    //Effects: converts the given JSONArray into a Map of Maze names and the corresponding Maze.
+    private Map<String, Maze> parseMazeList(JSONArray mazeListJson) {
         Map<String, Maze> mazeMap = new HashMap<>();
 
-        for (Object json : mazeList) {
+        for (Object json : mazeListJson) {
             JSONObject mazeJson = (JSONObject) json;
             Maze tempMaze = new Maze(mazeJson);
             mazeMap.put(tempMaze.getName(), tempMaze);

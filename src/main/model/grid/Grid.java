@@ -1,5 +1,5 @@
 /*
- * Handles all the computation and back-end functioning
+ * Handles all the computation and back-end functionality
  * keeps a track of the grid for the maze along with the elements and their respective positions */
 
 package model.grid;

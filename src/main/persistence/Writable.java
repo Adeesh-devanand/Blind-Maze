@@ -1,3 +1,6 @@
+/*
+ * Provides functionality of an object to be writable as Json  */
+
 package persistence;
 
 import org.json.JSONObject;

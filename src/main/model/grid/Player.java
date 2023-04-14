@@ -1,3 +1,6 @@
+/*
+ * Represents the user movable character */
+
 package model.grid;
 
 import model.Position;

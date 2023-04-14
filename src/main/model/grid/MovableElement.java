@@ -1,3 +1,7 @@
+/*
+* Represents a Movable Element on the grid, which can be moved either by the user
+* or moved internally */
+
 package model.grid;
 
 import model.Position;
@@ -45,11 +49,14 @@ public abstract class MovableElement extends Element {
         }
     }
 
+    //Modifies: EventLog.getInstance();
+    //Effects: logs the movement of the movable element on the grid
     protected void logMovement(String dir) {
         EventLog eventLog = EventLog.getInstance();
         eventLog.logEvent(new Event(this.getType() + " moved: " + dir));
     }
 
+    //Effects: returns the position of the MovableElement on the grid
     public Position getPosition() {
         return position;
     }
